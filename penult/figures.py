@@ -139,7 +139,10 @@ def _marker(attrs: dict[str, Any]) -> str:
 
 
 def substack_markdown(
-    markdown: str, sizes: dict[str, str] | None = None, *, inset_width: int = INSET_WIDTH
+    markdown: str,
+    sizes: dict[str, str] | None = None,
+    *,
+    inset_width: int = INSET_WIDTH,
 ) -> str:
     """The essay with a python-substack image marker after each image whose class says so.
 
@@ -203,11 +206,22 @@ def suggest_size(width: int, height: int, *, hero: bool) -> tuple[str, str]:
     if hero:
         if ratio >= _LANDSCAPE:
             return "normal", f"landscape hero ({shape}) fits the column"
-        kind = "square" if 0.9 <= ratio <= 1.1 else "portrait" if ratio < 0.9 else "squarish"
-        return "inset", f"{kind} hero: at column width it is taller than a laptop screen"
+        kind = (
+            "square"
+            if 0.9 <= ratio <= 1.1
+            else "portrait"
+            if ratio < 0.9
+            else "squarish"
+        )
+        return (
+            "inset",
+            f"{kind} hero: at column width it is taller than a laptop screen",
+        )
     if ratio >= _LANDSCAPE:
         return "normal", f"landscape ({shape}) at column width"
-    kind = "square" if 0.9 <= ratio <= 1.1 else "portrait" if ratio < 0.9 else "squarish"
+    kind = (
+        "square" if 0.9 <= ratio <= 1.1 else "portrait" if ratio < 0.9 else "squarish"
+    )
     return "inset", f"{kind} ({shape}): an inset keeps the text in view"
 
 
@@ -279,5 +293,10 @@ def with_sizes(markdown: str, sizes: dict[str, str]) -> str:
     block = [k for k, v in sizes.items() if v != DEFAULT_SIZE]
     if block:
         kept.append("images:")
-        kept += [f"  {json.dumps(k)}: {sizes[k]}" if ":" in k or " " in k else f"  {k}: {sizes[k]}" for k in block]
-    return "---\n" + "\n".join(kept) + "\n---\n" + markdown[found.end():]
+        kept += [
+            f"  {json.dumps(k)}: {sizes[k]}"
+            if ":" in k or " " in k
+            else f"  {k}: {sizes[k]}"
+            for k in block
+        ]
+    return "---\n" + "\n".join(kept) + "\n---\n" + markdown[found.end() :]

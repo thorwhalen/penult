@@ -523,7 +523,9 @@ def layout(
             if not r["size"] and r["suggested"] != _layout.DEFAULT_SIZE
         ]
         ws.essay.write_text(_layout.with_sizes(markdown, sizes), encoding="utf-8")
-        lines.append(f"written: images: for {len(changed)} image(s); render and post again")
+        lines.append(
+            f"written: images: for {len(changed)} image(s); render and post again"
+        )
     return {
         "ok": True,
         "summary": f"{len(images)} image(s), {len(differ)} differ from the rules"

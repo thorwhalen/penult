@@ -99,10 +99,22 @@ def render_comment(
         key = _relative(src)
         if not _is_remote(src):
             src = raw_base + quote(key, safe="/")
-        attrs = {"src": src, "alt": alt, **layout.github_attrs(sizes.get(key), **width_kw)}
-        tag = "<img " + " ".join(f'{k}="{html.escape(str(v), quote=True)}"' for k, v in attrs.items()) + ">"
+        attrs = {
+            "src": src,
+            "alt": alt,
+            **layout.github_attrs(sizes.get(key), **width_kw),
+        }
+        tag = (
+            "<img "
+            + " ".join(
+                f'{k}="{html.escape(str(v), quote=True)}"' for k, v in attrs.items()
+            )
+            + ">"
+        )
         image = f'<p align="center">{tag}</p>'
-        return image + (f'\n\n<p align="center"><sub>{html.escape(cap)}</sub></p>' if cap else "")
+        return image + (
+            f'\n\n<p align="center"><sub>{html.escape(cap)}</sub></p>' if cap else ""
+        )
 
     body = _IMAGE.sub(absolute, body)
     head = [f"# {fields['title']}", ""]
