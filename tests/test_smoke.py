@@ -146,7 +146,8 @@ def test_the_one_command_path(repo):
     rendered = penult.render(str(ws), runner=runner)
     comment = (ws / "comment.md").read_text()
     assert rendered["ok"] and "https://raw.githubusercontent.com/octo/essays/abc1234/docs/" in comment
-    assert "*A 1995 modem, public domain*" in comment and comment.startswith("# The Accretion Trap\n\n*On being right too early*")
+    assert '<p align="center"><sub>A 1995 modem, public domain</sub></p>' in comment
+    assert comment.startswith("# The Accretion Trap\n\n*On being right too early*")
     assert "Draft v1" in comment
 
     # post refuses while the image is not pushed, then posts, then updates

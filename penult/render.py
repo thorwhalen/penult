@@ -3,11 +3,13 @@
 The essay is written once, as ``essay.md`` with front matter (``title``,
 ``subtitle``) and relative image paths, which is what the ``article`` package
 publishes from. GitHub comments cannot see the repository's files, so for the
-comment every relative image becomes its ``raw.githubusercontent.com`` URL and a
-caption becomes an italic line under the image; the title and subtitle, which
-Substack shows in their own fields, are written as a heading.
+comment every relative image becomes its ``raw.githubusercontent.com`` URL in an
+``<img>`` tag (GitHub keeps ``width``, so an ``inset`` image is drawn narrower, see
+:mod:`penult.figures`) and a caption becomes a small centred line under it, the way
+the platforms draw captions; the title and subtitle, which Substack shows in their
+own fields, are written as a heading.
 
->>> text = '---\\ntitle: T\\nsubtitle: S\\n---\\n# T\\n\\nA line.\\n\\n![alt](img/a.png "A caption")\\n'
+>>> text = '---\\ntitle: T\\nsubtitle: S\\nimages:\\n  img/a.png: inset\\n---\\n# T\\n\\nA line.\\n\\n![alt](img/a.png "A caption")\\n'
 >>> print(render_comment(text, raw_base="https://raw.githubusercontent.com/o/r/main/docs/t/", footer=""))
 # T
 <BLANKLINE>
@@ -15,14 +17,15 @@ Substack shows in their own fields, are written as a heading.
 <BLANKLINE>
 A line.
 <BLANKLINE>
-![alt](https://raw.githubusercontent.com/o/r/main/docs/t/img/a.png)
+<p align="center"><img src="https://raw.githubusercontent.com/o/r/main/docs/t/img/a.png" alt="alt" width="400"></p>
 <BLANKLINE>
-*A caption*
+<p align="center"><sub>A caption</sub></p>
 """
 
 from __future__ import annotations
 
 import hashlib
+import html
 import re
 from urllib.parse import quote, unquote
 
@@ -76,17 +79,30 @@ def essay_fields(markdown: str) -> dict:
         raise PenultError(f"essay.md: {error}") from error
 
 
-def render_comment(markdown: str, *, raw_base: str, footer: str = "") -> str:
-    """The essay as a GitHub comment: heading, subtitle, body with absolute images."""
+def render_comment(
+    markdown: str, *, raw_base: str, footer: str = "", inset_width: int | None = None
+) -> str:
+    """The essay as a GitHub comment: heading, subtitle, body with absolute, sized images.
+
+    Image sizes come from the essay's ``images:`` front matter (:mod:`penult.figures`);
+    ``inset_width`` overrides the width an ``inset`` is drawn at.
+    """
+    from penult import figures as layout  # lazily: figures imports this module
+
     fields = essay_fields(markdown)
+    sizes = layout.sizes_from_fields(fields)
+    width_kw = {} if inset_width is None else {"inset_width": inset_width}
     body = fields["content_markdown"]
 
     def absolute(found: re.Match) -> str:
         alt, src, cap = found.group(1), found.group("src"), found.group("cap")
+        key = _relative(src)
         if not _is_remote(src):
-            src = raw_base + quote(_relative(src), safe="/")
-        image = f"![{alt}]({src})"
-        return image + (f"\n\n*{cap}*" if cap else "")
+            src = raw_base + quote(key, safe="/")
+        attrs = {"src": src, "alt": alt, **layout.github_attrs(sizes.get(key), **width_kw)}
+        tag = "<img " + " ".join(f'{k}="{html.escape(str(v), quote=True)}"' for k, v in attrs.items()) + ">"
+        image = f'<p align="center">{tag}</p>'
+        return image + (f'\n\n<p align="center"><sub>{html.escape(cap)}</sub></p>' if cap else "")
 
     body = _IMAGE.sub(absolute, body)
     head = [f"# {fields['title']}", ""]

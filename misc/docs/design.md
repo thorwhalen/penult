@@ -40,7 +40,7 @@ NOT seams, written directly: the thin-seed rule (word count and a sentence), the
 ## The next changes already known
 
 - A second seed kind (a Markdown file, a Discussion) is a new `fetch` behind seam 2 plus a `kind` branch inside `start` (where the workspace goes) and `post` (where the review happens); the CLI argument is already `seed`, so callers do not change.
-- Image display width on Substack is `article`'s open issue (#11); nothing in penult changes for it.
+- Image display width is settled (2026-11-06, after the author found the square hero too big): `penult.figures` holds size classes and the rules from `misc/docs/research/2026-11-06-illustration-layout-for-essays.md`; the class lives in `essay.md`'s `images:` front matter; `render` emits `<img width>`, `publish` hands article a private copy with python-substack's `<!-- python-substack-image:v1 ... -->` marker after each sized image, so `article` needed no change (its issue #11 is answered by the marker). Not a seam: the classes and their pixel mappings are written directly; `inset_width` is the one preference.
 - A Medium path that does not wait for the Substack post to be live would be a flag on `publish`, inside seam 5.
 
 ## Review

@@ -14,6 +14,7 @@ penult status docs/<slug>                                 # stage, files, what c
 penult check docs/<slug>                                  # ductus + penlike over essay.md; the report goes under ~/.local/share/penult, not the repo
 penult image-search "a 1995 modem" --folder docs/<slug>   # credited stock / public-domain candidates
 penult image-generate "<prompt>" --name hero --folder docs/<slug>   # at most 2 automatically; prompts past that are kept for you
+penult layout docs/<slug> --apply                         # size class per image (a square hero becomes an inset), into the front matter
 penult render docs/<slug> && penult post docs/<slug>      # the essay as an issue comment, images by raw URL
 penult approve docs/<slug> --note "good to go"            # the author's words; this gates publishing
 penult publish docs/<slug>                                # an unpublished Substack draft; you press Publish
@@ -28,7 +29,8 @@ penult holds what should not be improvised twice:
 - **the workspace**: `docs/<slug>/` next to the issue, with the seed as fetched, the brief (angle, audience, voice, platform, image budget, assumptions), the research notes, `essay.md`, `images.md` with every candidate, prompt and credit, `img/`, and a state file;
 - **the thin-seed gate**: a seed with no thesis or too few words is reported, and the agent asks the author before researching;
 - **the image budget**: paid generation capped per essay (two by default); every prompt is kept so the author can try the rest by hand;
-- **the review loop**: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs, captions kept), posted and updated in place, refusing while an image is not pushed;
+- **the layout rules**: each image has a size class (`inset`, `normal`, `large`, `full`) in `essay.md`'s front matter, suggested from its pixels by `penult layout` (a square or portrait image, or a non-landscape hero, is an inset; landscape, diagrams and charts take the column) and honoured both in the comment (`<img width>`) and on Substack (python-substack's image marker); the research behind the rules is in `misc/docs/research/`;
+- **the review loop**: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs and sized, captions drawn small under them), posted and updated in place, refusing while an image is not pushed;
 - **the approval gate**: `publish` runs only after `approve`, of the exact text that was posted, and only makes a draft; images in the comment are pinned to the pushed commit so the links outlive the branch.
 
 ## Your preferences stay private
@@ -43,6 +45,7 @@ Voices, platform, image budget, where the `article` credentials file is: `penult
 | `platform` | `substack` | where `publish` sends the approved essay (`substack` or `medium`) |
 | `max_generated_images` | `2` | paid images generated automatically per essay |
 | `min_image_prompts` | `5` | prompts the agent writes into `images.md` |
+| `inset_width` | `400` | how wide an `inset` image is drawn, in CSS pixels, in the comment and on Substack |
 | `article_env_file` | `~/.config/article/.env` | the `article` credentials file |
 | `article_state_path` | `~/.local/share/article/pipeline_state.json` | the `article` state file |
 | `workspace` | `docs/{slug}` | where a workspace goes in the issue's repository |

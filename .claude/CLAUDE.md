@@ -12,7 +12,7 @@ penult takes a seed (a GitHub issue) to a publication draft posted for review, t
 | image generation | `aix.image.generate_image` | `penult/images.py`, `generator=` |
 | publishing | `article_publisher` (the `article` command, JSON out) | `penult/tools.py`, `publisher=` on `publish` |
 
-Surfaces built: the shipped skill (primary) and the command line, both from `penult.tools.TOOLS`. Never write a second list of verbs. NOT seams, written directly: the thin-seed rule, the workspace layout, the comment template, the check report.
+Surfaces built: the shipped skill (primary) and the command line, both from `penult.tools.TOOLS`. Never write a second list of verbs. NOT seams, written directly: the thin-seed rule, the workspace layout, the comment template, the check report, the image size classes and their pixel mappings (`penult/figures.py`; the research behind them is `misc/docs/research/2026-11-06-illustration-layout-for-essays.md`).
 
 ## Rules
 
