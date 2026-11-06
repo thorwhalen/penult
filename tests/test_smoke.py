@@ -127,6 +127,18 @@ def test_the_one_command_path(repo):
     assert "budget" in third["reason"] and not (ws / "img" / "three.png").exists()
     forced = penult.image_generate("a third", name="three", folder=str(ws), files=files, generator=generator, force=True)
     assert forced["generated"]
+
+    # a request the provider rejects (4xx) is recorded but never counts as spent
+    class Rejected(Exception):
+        status_code = 400
+
+    def refusing(prompt, *, path, **_):
+        raise Rejected("Error code: 400 - unknown parameter")
+
+    with pytest.raises(Rejected):
+        penult.image_generate("rejected", name="four", folder=str(ws), files=files, generator=refusing, force=True)
+    kinds = [i["kind"] for i in json.loads((ws / "penult.json").read_text())["images"]]
+    assert kinds.count("generation-error") == 1 and "generated-failed" not in kinds
     ledger = (ws / "images.md").read_text()
     assert ledger.count("| generated |") == 3 and "| prompt |" in ledger and "| candidate |" in ledger
 
@@ -163,6 +175,9 @@ def test_the_one_command_path(repo):
     checked = penult.check(str(ws), files=files, data_dir=str(repo.parent / "data"), runner=runner)
     assert "serves as a test" in checked["text"] and "colons per 100 words" in checked["text"]
     assert Path(checked["path"]).is_relative_to(repo.parent / "data") and not (ws / "check.md").exists()
+    committed = (ws / "penult.json").read_text() + (ws / "brief.md").read_text()
+    assert "data" + "/" not in committed.replace(str(repo), "") and str(repo.parent / "data") not in committed
+    assert '"me"' not in (ws / "brief.md").read_text()  # the brief never names the private voice models
 
     # publish is gated on approval
     with pytest.raises(PenultError, match="approve"):

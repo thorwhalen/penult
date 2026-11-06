@@ -109,6 +109,20 @@ def _append_ledger(ws: Workspace, row: dict[str, Any]) -> None:
     ws.write_state(state)
 
 
+def _rejected(error: Exception) -> bool:
+    """Whether an error is the provider refusing the request (HTTP 4xx), which is never billed.
+
+    >>> class E(Exception): status_code = 400
+    >>> _rejected(E()), _rejected(ValueError("Error code: 404 - no such model")), _rejected(RuntimeError("timeout"))
+    (True, True, False)
+    """
+    code = getattr(error, "status_code", None) or getattr(getattr(error, "response", None), "status_code", None)
+    if isinstance(code, int):
+        return 400 <= code < 500
+    found = re.search(r"error code:?\s*(\d{3})\b", str(error), re.IGNORECASE)
+    return bool(found) and 400 <= int(found.group(1)) < 500
+
+
 def _safe_name(name: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
     if not cleaned or cleaned.startswith("."):
@@ -196,8 +210,10 @@ def generate_image(
     try:
         path = (generator or default_generator)(prompt, path=target, **options)
     except Exception as error:
-        # the call may have been billed, so it counts against the budget
-        _append_ledger(ws, {"when": now(), "kind": "generated-failed", "prompt": prompt, "credit": str(error)[:200], "used": False})
+        # A request the provider rejected (a 4xx: bad parameter, unknown model) was
+        # never billed and does not count; anything else may have been, and does.
+        kind = "generation-error" if _rejected(error) else "generated-failed"
+        _append_ledger(ws, {"when": now(), "kind": kind, "prompt": prompt, "credit": str(error)[:200], "used": False})
         raise
     _append_ledger(ws, {
         "when": now(), "kind": "generated", "file": f"img/{Path(path).name}", "prompt": prompt,
