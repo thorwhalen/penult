@@ -1,6 +1,6 @@
 ---
 name: penult
-description: Take an idea (a GitHub issue) to a publication draft posted for the author's review, then, once they approve, to an unpublished Substack or Medium draft. Use on "make a draft for <issue url>", "turn this issue into an essay", "write up issue N for Substack", "draft the next essay", "post the draft on the issue", "they approved it, publish the draft", or whenever an essay goes from a seed to a reviewed draft. Drives the whole path with the penult verbs (workspace, state, images within budget, issue comment, publishing hand-off) and the skills that own each step: do-research for checking claims and finding critiques, penlike (and its author-choice guide) and deslop for voice, ductus for machine-sounding passages, illustration for credited images. Never publishes publicly; never sends to a platform before the author says the posted draft is good.
+description: Take an idea (a GitHub issue) to a publication draft posted for the author's review, then, once they approve, to an unpublished Substack or Medium draft. Use on "make a draft for <issue url>", "turn this issue into an essay", "write up issue N for Substack", "draft the next essay", "post the draft on the issue", "they approved it, publish the draft", or whenever an essay goes from a seed to a reviewed draft. Drives the whole path with the penult verbs (workspace, state, images within budget, issue comment, publishing hand-off) and the skills that own each step: do-research for checking claims and finding critiques, penlike (and its author-choice guide) and deslop for voice, ductus for machine-sounding passages, illustration for credited images. Posts the draft only where the author asked (the issue thread, public if the repository is); never publishes to a platform, and never sends anything to a platform before the author says the posted draft is good.
 license: MIT
 metadata:
   audience: users
@@ -8,7 +8,7 @@ metadata:
 
 # penult: from a seed to a draft the author can review
 
-The author gives you a seed, usually an issue in their essays repository, and wants back a link to a **draft posted as a comment on that issue**, with images inline, in their voice, every claim checked and the other side of each argument known. They iterate with you there. When they say it is good, you make an **unpublished** platform draft and give them the link; they press Publish themselves. Nothing you do publishes anything.
+The author gives you a seed, usually an issue in their essays repository, and wants back a link to a **draft posted as a comment on that issue**, with images inline, in their voice, every claim checked and the other side of each argument known. They iterate with you there. When they say it is good, you make an **unpublished** platform draft and give them the link; they press Publish themselves. Nothing you do publishes to a platform. The issue comment is as public as the repository is, which is what the author asked for; if the essay must stay private until it is out, say so before posting and ask where the review should happen.
 
 Everything about *how* the author wants this (voices, platform, image budget, where their credentials are) is in their private preferences: `penult prefs`. Everything about *this* essay (the seed, the brief, the research, the draft, the images and their credits, what was posted) is in the workspace that `penult start` makes next to the issue, in `docs/<slug>/` of its repository, so that it is versioned and searchable later.
 
@@ -27,7 +27,7 @@ Read `seed.md`. Fill the `[DECIDE: ...]` lines of `brief.md`: thesis, angle and 
 
 ### 2. Research
 
-Load the `do-research` skill, Deep depth. The themes are fixed by the job: **verify every claim the seed makes** (numbers, quotes, attributions, dates), **find the critiques and counter-evidence** so the essay knows both sides, **the standard names** for the things it talks about, and **candidate images**: figures, tables, charts and public-domain art worth using, each with its source and licence. Run the themes as parallel agents; each writes one Vancouver-referenced note into `research/` of the workspace (lowercase filenames, `[name](url)` references, estimates labelled, "unverified" said plainly). Then `penult mark <workspace> --stage researched`.
+Load the `do-research` skill, Deep depth. The themes are fixed by the job: **verify every claim the seed makes** (numbers, quotes, attributions, dates), **find the critiques and counter-evidence** so the essay knows both sides, **the standard names** for the things it talks about, and **candidate images**: figures, tables, charts and public-domain art worth using, each with its source and licence. Run the themes as parallel agents; each writes one Vancouver-referenced note into `research/` of the workspace (lowercase filenames, `[name](url)` references, estimates labelled, "unverified" said plainly). Then `penult mark <workspace> --stage researched`. (Every verb below takes the workspace as its first argument or as `--folder`; the examples leave it out for brevity.)
 
 ### 3. Draft
 
@@ -41,13 +41,13 @@ Load the `penlike` skill and run `penlike guide`: it is the author's own rule bo
 2. The passages the guide reserves for another author (an opening jab, a close, a deadpan debunking) are rewritten in that author's register, short, and only where the subject invites it.
 3. The `deslop` skill's passes for rhythm, specificity and ownership; then `penlike check` against the base voice, at most two rounds.
 
-`penult check <workspace>` runs ductus and penlike over the essay and writes `check.md`; read it, but do not chase a zero: human writing is flagged too, and bland prose with no tell is the worse failure. `penult mark --stage styled`.
+`penult check <workspace>` runs ductus and penlike over the essay and writes a check file under the private data root (it quotes the author's style-model figures, so it never goes into the workspace); read it, but do not chase a zero: human writing is flagged too, and bland prose with no tell is the worse failure. `penult mark --stage styled`.
 
 ### 5. Images
 
 For each place an image belongs (the hero, one per major turn of the argument, any figure the research found):
 
-- **Existing images first**: `penult image-search "<what the beat shows>"` (the `illustration` package: Openverse, public-domain art, with licence and attribution). Take one with `penult image-add <url> --name <file> --credit "<credit line>" --license <licence>`; the credit goes in the Markdown caption.
+- **Existing images first**: `penult image-search "<what the beat shows>" --folder <workspace>` (the `illustration` package: Openverse, public-domain art, with licence and attribution). Take one with `penult image-add <url> --name <file> --credit "<credit line>" --license <licence>`; the credit goes in the Markdown caption.
 - **Prompts**: write at least `min_image_prompts` (default 5) prompts into `images.md`, each saying the beat, the style, the composition. Generate **at most `max_generated_images` (default 2)** of them with `penult image-generate "<prompt>" --name <file>`: the top one or two, chosen for where an image matters most. The budget is deliberate: generated images are paid and often off; the author tries the other prompts by hand and gives you the files (`penult image-add <file> --name ... --credit "Image generated for this essay" --prompt "<the prompt>"`).
 - Figures and tables from the research are redrawn (matplotlib, a clean table image) and credited to their source.
 
@@ -69,7 +69,7 @@ Give the author the comment link. Iterate on their comments: edit `essay.md`, re
 Only when the author says the posted draft is good, in their words:
 
 ```bash
-penult approve <workspace> --by <who> --note "<their words>"
+penult approve <workspace> --by <who> --note "<their words>"   # of the text as posted; a later edit needs a new post and approval
 penult publish <workspace>               # substack by default: an UNPUBLISHED draft via `article draft-substack`; prints the editor link
 penult publish <workspace> --dry-run     # what Substack would lose (tables, inline images), no credentials needed
 ```

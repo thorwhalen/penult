@@ -6,12 +6,12 @@ From an idea to a publication draft: the penultimate step, where the essay exist
 pip install penult
 ```
 
-The seed is a GitHub issue. An agent, with the `penult` skill, turns it into an essay posted as a comment on that issue for the author to review, and, once the author approves, into an **unpublished** Substack or Medium draft through [article](https://github.com/thorwhalen/article). penult never publishes anything itself.
+The seed is a GitHub issue. An agent, with the `penult` skill, turns it into an essay posted as a comment on that issue for the author to review, and, once the author approves, into an **unpublished** Substack or Medium draft through [article](https://github.com/thorwhalen/article). penult never publishes to a platform; the draft is as public as the issue it is posted on.
 
 ```bash
 penult start https://github.com/you/essays/issues/30     # workspace docs/<slug>/ in the repo: seed.md, brief.md, state
 penult status docs/<slug>                                 # stage, files, what comes next
-penult check docs/<slug>                                  # ductus (machine-sounding passages) + penlike (voice) over essay.md
+penult check docs/<slug>                                  # ductus + penlike over essay.md; the report goes under ~/.local/share/penult, not the repo
 penult image-search "a 1995 modem" --folder docs/<slug>   # credited stock / public-domain candidates
 penult image-generate "<prompt>" --name hero --folder docs/<slug>   # at most 2 automatically; prompts past that are kept for you
 penult render docs/<slug> && penult post docs/<slug>      # the essay as an issue comment, images by raw URL
@@ -29,7 +29,7 @@ penult holds what should not be improvised twice:
 - **the thin-seed gate**: a seed with no thesis or too few words is reported, and the agent asks the author before researching;
 - **the image budget**: paid generation capped per essay (two by default); every prompt is kept so the author can try the rest by hand;
 - **the review loop**: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs, captions kept), posted and updated in place, refusing while an image is not pushed;
-- **the approval gate**: `publish` runs only after `approve`, and only makes a draft.
+- **the approval gate**: `publish` runs only after `approve`, of the exact text that was posted, and only makes a draft; images in the comment are pinned to the pushed commit so the links outlive the branch.
 
 ## Your preferences stay private
 
@@ -62,10 +62,10 @@ penult.render("docs/my-essay"); penult.post("docs/my-essay")
 ## Install the skill
 
 ```bash
-gh skill install thorwhalen/penult penult --agent claude-code
+gh skill install thorwhalen/penult penult --agent claude-code   # needs a GitHub CLI with `gh skill`
 ```
 
-The skill is in `penult/data/skills/penult/` and ships with the package.
+Or copy (or symlink) `penult/data/skills/penult/` into your agent's skills folder; it ships with the package. Extras: `pip install 'penult[publish]'` for the Substack step, `'penult[images]'` for search and generation, `'penult[style]'` for the checks.
 
 ## Related
 

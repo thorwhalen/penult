@@ -35,6 +35,9 @@ Repository = "https://github.com/thorwhalen/penult"
 Documentation = "https://thorwhalen.github.io/penult"
 
 [project.optional-dependencies]
+publish = [
+    "article[substack]",
+]
 images = [
     "illustration",
     "aix[image]",

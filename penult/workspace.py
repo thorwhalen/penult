@@ -13,7 +13,9 @@ issue they came from and found by whoever indexes that repository's docs::
         images.md        every image candidate and prompt, with credit and licence
         img/             the images the essay uses
         comment.md       the essay rendered for an issue comment
-        check.md         the last style and machine-writing check
+
+The style check (``penult check``) is written under the private data root, not
+here: it quotes figures from the author's private style models.
 
 >>> ws = Workspace("/tmp/x/docs/an-essay")
 >>> ws.essay.name, ws.state_file.name
@@ -30,7 +32,6 @@ from typing import Any
 
 from penult.base import (
     BRIEF_FILE,
-    CHECK_FILE,
     COMMENT_FILE,
     ESSAY_FILE,
     IMAGES_FILE,
@@ -88,7 +89,8 @@ def is_thin(issue: dict[str, Any], *, threshold: int = THIN_SEED_WORDS) -> dict[
     texts = [issue.get("title", ""), issue.get("body", "")]
     texts += [c.get("body", "") for c in issue.get("comments") or []]
     words = sum(word_count(t) for t in texts)
-    has_thesis = bool(re.search(r"[.!?]\s", issue.get("body", "") + " "))
+    body = re.sub(r"\S+://\S+|\b(?:e\.g|i\.e|etc|vs)\.", "", issue.get("body", ""))
+    has_thesis = bool(re.search(r"\w{3,}[^\s.]*[.!?](\s|$)", body))
     thin = words < threshold or not has_thesis
     reasons = []
     if words < threshold:
@@ -118,7 +120,6 @@ class Workspace:
     essay = property(lambda self: self.folder / ESSAY_FILE)
     images_ledger = property(lambda self: self.folder / IMAGES_FILE)
     comment = property(lambda self: self.folder / COMMENT_FILE)
-    check_report = property(lambda self: self.folder / CHECK_FILE)
     img = property(lambda self: self.folder / IMG_DIR)
     research = property(lambda self: self.folder / RESEARCH_DIR)
 
@@ -179,7 +180,6 @@ class Workspace:
             "images_ledger": self.images_ledger.is_file(),
             "images": images,
             "comment": self.comment.is_file(),
-            "check": self.check_report.is_file(),
         }
 
 

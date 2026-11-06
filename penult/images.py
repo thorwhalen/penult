@@ -50,7 +50,7 @@ def hit_record(hit: Any) -> dict[str, Any]:
     """One search hit as a plain dict, whatever object the searcher returned."""
     return {
         "url": _hit_field(hit, "url", "image_url"),
-        "page": _hit_field(hit, "page_url", "foreign_landing_url", "source_url", "landing_url"),
+        "page": _hit_field(hit, "source_page_url", "page_url", "foreign_landing_url", "source_url", "landing_url"),
         "title": _hit_field(hit, "title", "alt", "description") or "",
         "author": _hit_field(hit, "author", "creator", "photographer") or "",
         "license": _hit_field(hit, "license", "license_type") or "",
@@ -139,11 +139,18 @@ def add_image(
     suffix = Path(source.split("?")[0]).suffix or ".png"
     target = ws.img / (name if Path(name).suffix else name + suffix)
     if re.match(r"https?://", source):
+        # Wikimedia and others refuse urllib's default agent; name ourselves.
+        request = urllib.request.Request(source, headers={"User-Agent": "penult/0.1 (+https://github.com/thorwhalen/penult)"})
         try:
-            with urllib.request.urlopen(source, timeout=60) as response:  # noqa: S310 - the user's own URL
-                target.write_bytes(response.read())
+            with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 - the user's own URL
+                data = response.read()
+                content_type = response.headers.get("Content-Type", "")
         except OSError as error:
             raise PenultError(f"could not download {source}: {error}") from error
+        if not Path(source.split("?")[0]).suffix and not Path(name).suffix:
+            guessed = {"image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "image/webp": ".webp", "image/svg+xml": ".svg"}
+            target = target.with_suffix(guessed.get(content_type.split(";")[0].strip(), ".png"))
+        target.write_bytes(data)
     else:
         origin = Path(source).expanduser()
         if not origin.is_file():
@@ -152,7 +159,8 @@ def add_image(
             target.write_bytes(origin.read_bytes())
     _append_ledger(ws, {
         "when": now(), "kind": "generated-by-hand" if prompt else "added", "file": f"img/{target.name}",
-        "credit": credit, "license": license, "prompt": prompt, "origin": source, "used": used,
+        "credit": credit, "license": license, "prompt": prompt,
+        "origin": source if re.match(r"https?://", source) else None, "used": used,
     })  # fmt: skip
     return target
 
@@ -175,7 +183,7 @@ def generate_image(
     """
     name = _safe_name(name)
     state = ws.read_state()
-    generated = [r for r in state.get("images", []) if r.get("kind") == "generated"]
+    generated = [r for r in state.get("images", []) if r.get("kind") in ("generated", "generated-failed")]
     if len(generated) >= max_generated and not force:
         _append_ledger(ws, {"when": now(), "kind": "prompt", "prompt": prompt, "used": False})
         return {
@@ -185,7 +193,12 @@ def generate_image(
         }
     ws.img.mkdir(parents=True, exist_ok=True)
     target = ws.img / (name if Path(name).suffix else name + ".png")
-    path = (generator or default_generator)(prompt, path=target, **options)
+    try:
+        path = (generator or default_generator)(prompt, path=target, **options)
+    except Exception as error:
+        # the call may have been billed, so it counts against the budget
+        _append_ledger(ws, {"when": now(), "kind": "generated-failed", "prompt": prompt, "credit": str(error)[:200], "used": False})
+        raise
     _append_ledger(ws, {
         "when": now(), "kind": "generated", "file": f"img/{Path(path).name}", "prompt": prompt,
         "credit": "Image generated for this essay", "license": "", "used": True,

@@ -1,8 +1,8 @@
-"""GitHub, through the ``gh`` command: read an issue, post or edit a comment, find raw URLs.
+"""GitHub, through the ``gh`` and ``git`` commands: read an issue, post or edit a comment, find raw URLs.
 
 Every function takes a ``runner`` (the shape of :func:`subprocess.run`) so tests
-run without a network and another transport (the REST API, a library) can be
-dropped in. The default needs an authenticated ``gh``.
+run without a network and another transport can be dropped in. The default needs
+an authenticated ``gh``.
 
 >>> parse_issue_url("https://github.com/octo/essays/issues/30")
 ('octo', 'essays', 30)
@@ -31,13 +31,14 @@ __all__ = [
 
 Runner = Callable[..., Any]
 
-_ISSUE_URL = re.compile(r"github\.com/([^/]+)/([^/]+)/issues/(\d+)")
-_REMOTE = re.compile(r"github\.com[:/]([^/]+)/([^/.]+?)(?:\.git)?/?$")
+_ISSUE_URL = re.compile(r"^https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/issues/(\d+)(?:[/#?].*)?$")
+_REMOTE = re.compile(r"[:/]([^/:]+)/([^/]+?)(?:\.git)?/?$")
+_TIMEOUT = 600
 
 
 def parse_issue_url(url: str) -> tuple[str, str, int]:
     """``(owner, repo, number)`` from an issue URL, or an error that shows the shape."""
-    found = _ISSUE_URL.search(url)
+    found = _ISSUE_URL.match(url.strip())
     if not found:
         raise PenultError(
             f"not a GitHub issue URL: {url!r}; expected https://github.com/<owner>/<repo>/issues/<n>"
@@ -48,13 +49,13 @@ def parse_issue_url(url: str) -> tuple[str, str, int]:
 
 def _run(runner: Runner, args: list[str], *, what: str, **kwargs: Any) -> str:
     try:
-        done = runner(args, capture_output=True, text=True, **kwargs)
+        done = runner(args, capture_output=True, text=True, timeout=_TIMEOUT, **kwargs)
     except FileNotFoundError as error:
         raise PenultError(f"{args[0]!r} is not installed; it is needed to {what}") from error
     if done.returncode != 0:
         detail = (done.stderr or done.stdout or "").strip()
         raise PenultError(f"could not {what}: {detail or 'command failed'}")
-    return done.stdout
+    return done.stdout or ""
 
 
 def fetch_issue(url: str, *, runner: Runner = subprocess.run) -> dict[str, Any]:
@@ -68,6 +69,7 @@ def fetch_issue(url: str, *, runner: Runner = subprocess.run) -> dict[str, Any]:
     )  # fmt: skip
     raw = json.loads(out)
     return {
+        "kind": "github-issue",
         "owner": owner,
         "repo": repo,
         "number": number,
@@ -117,51 +119,78 @@ def edit_comment(comment_url: str, body_file: Path, *, runner: Runner = subproce
 
 
 def repo_of_checkout(path: Path, *, runner: Runner = subprocess.run) -> dict[str, Any] | None:
-    """The checkout holding ``path``: its root, GitHub owner/repo and branch, or ``None``."""
+    """The checkout holding ``path``: its root, GitHub owner/repo, branch and commit, or ``None``."""
     try:
-        root = _run(runner, ["git", "-C", str(path), "rev-parse", "--show-toplevel"], what="find the repo").strip()
-        remote = _run(runner, ["git", "-C", root, "remote", "get-url", "origin"], what="read the remote").strip()
-        branch = _run(runner, ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"], what="read the branch").strip()
+        git = ["git", "-C", str(path)]
+        root = _run(runner, [*git, "rev-parse", "--show-toplevel"], what="find the repo").strip()
+        git = ["git", "-C", root]
+        remote = _run(runner, [*git, "remote", "get-url", "origin"], what="read the remote").strip()
+        branch = _run(runner, [*git, "rev-parse", "--abbrev-ref", "HEAD"], what="read the branch").strip()
+        sha = _run(runner, [*git, "rev-parse", "HEAD"], what="read the commit").strip()
     except PenultError:
         return None
-    found = _REMOTE.search(remote)
+    found = _REMOTE.search(remote) if "github" in remote else None
     if not found:
         return None
     owner, repo = found.groups()
-    return {"root": root, "owner": owner, "repo": repo, "branch": branch}
+    return {"root": root, "owner": owner, "repo": repo, "branch": branch, "sha": sha or branch}
 
 
 def raw_url_base(checkout: dict[str, Any], folder: Path) -> str:
-    """The ``raw.githubusercontent.com`` prefix for files in ``folder`` of that checkout.
+    """The ``raw.githubusercontent.com`` prefix for files in ``folder`` at the checkout's commit.
 
-    >>> raw_url_base({"root": "/r", "owner": "o", "repo": "e", "branch": "main"}, Path("/r/docs/an essay"))
-    'https://raw.githubusercontent.com/o/e/main/docs/an%20essay/'
+    The commit, not the branch, so the links keep working after the branch is
+    merged and deleted.
+
+    >>> raw_url_base({"root": "/r", "owner": "o", "repo": "e", "branch": "main", "sha": "abc123"}, Path("/r/docs/an essay"))
+    'https://raw.githubusercontent.com/o/e/abc123/docs/an%20essay/'
     """
     rel = Path(folder).resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
     rel = quote(rel) + "/" if rel not in ("", ".") else ""
-    return f"https://raw.githubusercontent.com/{checkout['owner']}/{checkout['repo']}/{checkout['branch']}/{rel}"
+    ref = checkout.get("sha") or checkout["branch"]
+    return f"https://raw.githubusercontent.com/{checkout['owner']}/{checkout['repo']}/{ref}/{rel}"
+
+
+def _status_paths(porcelain_z: str) -> set[str]:
+    """Paths in ``git status --porcelain -z`` output (a rename lists its old path too).
+
+    >>> sorted(_status_paths("?? a.png\\0R  new.png\\0old.png\\0"))
+    ['a.png', 'new.png', 'old.png']
+    """
+    found: set[str] = set()
+    entries = [e for e in porcelain_z.split("\0") if e]
+    i = 0
+    while i < len(entries):
+        entry = entries[i]
+        found.add(entry[3:] if len(entry) > 3 else entry)
+        if entry[:1] in ("R", "C") and i + 1 < len(entries):
+            found.add(entries[i + 1])
+            i += 1
+        i += 1
+    return found
 
 
 def unpushed(checkout: dict[str, Any], paths: list[Path], *, runner: Runner = subprocess.run) -> list[str]:
     """Which of ``paths`` are not yet committed and pushed to the branch's upstream.
 
     A raw URL only works for a file that is on GitHub, so ``post`` refuses while any
-    image it references is in this list.
+    image it references is in this list. Paths are compared in git's own form
+    (forward slashes, unescaped thanks to ``-z``).
     """
-    root = checkout["root"]
-    # git prints paths with forward slashes on every platform, so compare in that form
-    names = [Path(p).resolve().relative_to(Path(root).resolve()).as_posix() for p in paths]
+    root = Path(checkout["root"]).resolve()
+    names = [Path(p).resolve().relative_to(root).as_posix() for p in paths]
     if not names:
         return []
-    dirty = _run(runner, ["git", "-C", root, "status", "--porcelain", "--", *names], what="check the tree")
-    missing = {line[3:].strip().strip('"') for line in dirty.splitlines() if line.strip()}
+    git = ["git", "-C", str(root)]
+    dirty = _run(runner, [*git, "status", "--porcelain", "-z", "--", *names], what="check the tree")
+    missing = _status_paths(dirty)
     try:
         ahead = _run(
             runner,
-            ["git", "-C", root, "log", "--name-only", "--pretty=format:", "@{upstream}..HEAD", "--", *names],
+            [*git, "log", "--name-only", "-z", "--pretty=format:", "@{upstream}..HEAD", "--", *names],
             what="compare with the upstream",
         )
-        missing |= {line.strip() for line in ahead.splitlines() if line.strip()}
+        missing |= {p.strip() for p in re.split(r"[\0\n]", ahead) if p.strip()}
     except PenultError:
         missing |= set(names)  # no upstream: nothing of this branch is on GitHub
     return sorted(n for n in names if n in missing)

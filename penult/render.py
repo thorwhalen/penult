@@ -22,12 +22,24 @@ A line.
 
 from __future__ import annotations
 
+import hashlib
 import re
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
-__all__ = ["local_images", "render_comment"]
+from penult.base import PenultError
+
+__all__ = ["essay_fields", "local_images", "render_comment", "text_hash"]
 
 _IMAGE = re.compile(r'!\[([^\]]*)\]\(\s*(?P<src>[^)\s]+)(?:\s+"(?P<cap>[^"]*)")?\s*\)')
+
+
+def text_hash(text: str) -> str:
+    """A short, stable fingerprint of a text, to tell whether it changed.
+
+    >>> text_hash("a") == text_hash("a"), text_hash("a") != text_hash("b")
+    (True, True)
+    """
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
 def _is_remote(src: str) -> bool:
@@ -37,32 +49,42 @@ def _is_remote(src: str) -> bool:
 def local_images(markdown: str) -> list[str]:
     """The relative image paths an essay references, in order, without duplicates.
 
-    >>> local_images('![a](img/a.png) ![b](https://x/y.png) ![c](img/a.png)')
+    >>> local_images('![a](img/a.png) ![b](https://x/y.png) ![c](./img/a.png)')
     ['img/a.png']
     """
     seen: list[str] = []
     for found in _IMAGE.finditer(markdown):
-        src = found.group("src")
+        src = _relative(found.group("src"))
         if not _is_remote(src) and src not in seen:
             seen.append(src)
     return seen
 
 
-def _fields(markdown: str) -> dict:
+def _relative(src: str) -> str:
+    src = unquote(src)
+    return src[2:] if src.startswith("./") else src
+
+
+def essay_fields(markdown: str) -> dict:
+    """Title, subtitle, tags, slug and body from an essay's Markdown, as ``article`` reads it."""
+    from article.base import ArticleError
     from article.md_source import markdown_to_fields
 
-    return markdown_to_fields(markdown, origin="essay.md")
+    try:
+        return markdown_to_fields(markdown, origin="essay.md")
+    except ArticleError as error:
+        raise PenultError(f"essay.md: {error}") from error
 
 
 def render_comment(markdown: str, *, raw_base: str, footer: str = "") -> str:
     """The essay as a GitHub comment: heading, subtitle, body with absolute images."""
-    fields = _fields(markdown)
+    fields = essay_fields(markdown)
     body = fields["content_markdown"]
 
     def absolute(found: re.Match) -> str:
         alt, src, cap = found.group(1), found.group("src"), found.group("cap")
         if not _is_remote(src):
-            src = raw_base + quote(src.lstrip("./"), safe="/")
+            src = raw_base + quote(_relative(src), safe="/")
         image = f"![{alt}]({src})"
         return image + (f"\n\n*{cap}*" if cap else "")
 
@@ -70,7 +92,7 @@ def render_comment(markdown: str, *, raw_base: str, footer: str = "") -> str:
     head = [f"# {fields['title']}", ""]
     if fields.get("subtitle"):
         head += [f"*{fields['subtitle']}*", ""]
-    out = "\n".join(head) + body.strip() + "\n"
+    out = "\n".join(head) + "\n" + body.strip() + "\n"
     if footer:
         out += "\n---\n\n" + footer.strip() + "\n"
     return out.rstrip("\n")

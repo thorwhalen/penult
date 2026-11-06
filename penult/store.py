@@ -142,17 +142,26 @@ def set_preference(
 ) -> dict[str, Any]:
     """Set one preference and return the whole set.
 
-    ``value`` is parsed as JSON when it is a string that parses (so ``2`` is a number
-    and ``'["me", "dfw"]'`` a list), else kept as text.
+    ``value`` must have the type of the default: a number (``2``), a JSON list
+    (``'["me", "dfw"]'``) or text.
     """
     if key not in DEFAULT_PREFERENCES:
         known = ", ".join(sorted(DEFAULT_PREFERENCES))
         raise PenultError(f"unknown preference {key!r}; the preferences are: {known}")
-    if isinstance(value, str):
+    expected = DEFAULT_PREFERENCES[key]
+    if isinstance(value, str) and not isinstance(expected, str):
         try:
             value = json.loads(value)
         except ValueError:
             pass
+    if isinstance(expected, bool) and not isinstance(value, bool) or (
+        not isinstance(expected, bool) and not isinstance(value, type(expected))
+    ):
+        raise PenultError(
+            f"{key} takes a {type(expected).__name__} (as JSON, e.g. {json.dumps(expected)}), got {value!r}"
+        )
+    if isinstance(expected, list) and not all(isinstance(v, str) for v in value):
+        raise PenultError(f"{key} takes a list of strings, got {value!r}")
     current = preferences(data_dir=data_dir, files=files)
     current[key] = value
     write_preferences(current, data_dir=data_dir, files=files)

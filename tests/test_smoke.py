@@ -51,16 +51,25 @@ class FakeRunner:
                 out = "git@github.com:octo/essays.git"
             elif "--abbrev-ref" in args:
                 out = "main"
+            elif args[-1] == "HEAD" and "rev-parse" in args:
+                out = "abc1234"
             elif "status" in args:
-                out = "\n".join(f"?? {p}" for p in self.unpushed)
+                out = "".join(f"?? {p}\0" for p in self.unpushed)
             elif "log" in args:
                 out = ""
         elif args[:3] == ["gh", "issue", "comment"]:
             out = "https://github.com/octo/essays/issues/30#issuecomment-111\n"
         elif args[:2] == ["gh", "api"]:
             out = "{}"
-        elif args[:2] == ["article", "draft-substack"]:
-            out = "substack: ok\nEdit the draft: https://octo.substack.com/publish/post/42\n"
+        elif args[1:4] == ["-m", "article", "draft-substack"]:
+            out = json.dumps({"phase": "primary", "results": [{"platform": "substack", "url": "https://octo.substack.com/p/x",
+                              "detail": {"edit_url": "https://octo.substack.com/publish/post/42"}}]})
+        elif args[1:3] == ["-m", "ductus"]:
+            out = json.dumps({"document": {"label": "mixed-signals", "lean": 0.2, "strength": 0.4}, "segments": [
+                {"lean": 1.0, "strength": 0.3, "span": {"quote": "It is important to note that this serves as a test."},
+                 "signals": [{"direction": "machine", "note": "serves as: say is"}]}]})
+        elif args[1:3] == ["-m", "penlike"]:
+            out = json.dumps({"ok": False, "register": "essay", "discrepancies": [{"x": 1}], "text": "- colons per 100 words: 3 vs 0.5"})
         return subprocess.CompletedProcess(args, 0, stdout=out, stderr="")
 
 
@@ -85,7 +94,9 @@ def test_the_one_command_path(repo):
     # a second start refuses to clobber, --force refetches
     with pytest.raises(PenultError):
         penult.start(ISSUE_URL, files=files, fetch=fake_issue, runner=runner)
+    (ws / "brief.md").write_text("# Brief: filled in by hand\n", encoding="utf-8")
     penult.start(ISSUE_URL, files=files, fetch=fake_issue, runner=runner, force=True)
+    assert (ws / "brief.md").read_text() == "# Brief: filled in by hand\n"  # --force keeps the brief
 
     penult.mark(str(ws), stage="researched")
     (ws / "essay.md").write_text(
@@ -122,7 +133,7 @@ def test_the_one_command_path(repo):
     # render: relative images become raw URLs, caption becomes a line
     rendered = penult.render(str(ws), runner=runner)
     comment = (ws / "comment.md").read_text()
-    assert rendered["ok"] and "https://raw.githubusercontent.com/octo/essays/main/docs/" in comment
+    assert rendered["ok"] and "https://raw.githubusercontent.com/octo/essays/abc1234/docs/" in comment
     assert "*A 1995 modem, public domain*" in comment and comment.startswith("# The Accretion Trap\n\n*On being right too early*")
     assert "Draft v1" in comment
 
@@ -138,21 +149,35 @@ def test_the_one_command_path(repo):
     again = penult.post(str(ws), runner=runner)
     assert again["version"] == 2 and runner.calls[-1][:2] == ["gh", "api"]
 
+    # an edit after the render is caught before posting, and before approving
+    essay = ws / "essay.md"
+    essay.write_text(essay.read_text() + "\nA late edit.\n", encoding="utf-8")
+    with pytest.raises(PenultError, match="render first"):
+        penult.post(str(ws), runner=runner)
+    with pytest.raises(PenultError, match="post it again"):
+        penult.approve(str(ws))
+    penult.render(str(ws), runner=runner)
+    penult.post(str(ws), runner=runner)
+
+    # check runs ductus and penlike through python -m, writes under the data root, quotes the flagged text
+    checked = penult.check(str(ws), files=files, data_dir=str(repo.parent / "data"), runner=runner)
+    assert "serves as a test" in checked["text"] and "colons per 100 words" in checked["text"]
+    assert Path(checked["path"]).is_relative_to(repo.parent / "data") and not (ws / "check.md").exists()
+
     # publish is gated on approval
     with pytest.raises(PenultError, match="approve"):
         penult.publish(str(ws), files=files, runner=runner)
     penult.approve(str(ws), by="octo", note="good to go")
-    published = penult.publish(str(ws), files=files, runner=runner) if _article_installed() else None
-    if published:
-        assert published["draft_url"] == "https://octo.substack.com/publish/post/42"
-        assert penult.status(str(ws))["state"]["stage"] == "published"
-        assert "-e" in runner.calls[-1] and "--dry-run" not in runner.calls[-1]
-
-
-def _article_installed():
-    import shutil
-
-    return shutil.which("article") is not None
+    essay.write_text(essay.read_text() + "\nAnother edit.\n", encoding="utf-8")
+    with pytest.raises(PenultError, match="approved"):
+        penult.publish(str(ws), files=files, runner=runner)  # the approval was of the earlier text
+    penult.render(str(ws), runner=runner); penult.post(str(ws), runner=runner); penult.approve(str(ws), by="octo")
+    published = penult.publish(str(ws), files=files, runner=runner)
+    assert published["draft_url"] == "https://octo.substack.com/publish/post/42"
+    assert penult.status(str(ws))["state"]["stage"] == "published"
+    assert "--json-out" in runner.calls[-1] and "--dry-run" not in runner.calls[-1] and "--update" not in runner.calls[-1]
+    penult.publish(str(ws), files=files, runner=runner)
+    assert "--update" in runner.calls[-1]  # a second run updates the same draft
 
 
 def test_a_thin_seed_is_reported_and_the_brief_says_to_ask(repo):
@@ -185,6 +210,10 @@ def test_preferences_have_defaults_and_keep_only_changes():
     assert saved == {"max_generated_images": 1, "voice_models": ["me", "dan-luu"]}
     with pytest.raises(PenultError, match="unknown preference"):
         penult.prefs_set("colour", "blue", files=files)
+    with pytest.raises(PenultError, match="takes a list"):
+        penult.prefs_set("voice_models", "me", files=files)
+    with pytest.raises(PenultError, match="takes a int"):
+        penult.prefs_set("max_generated_images", "two", files=files)
 
 
 def test_importing_the_package_loads_no_surface_library():
