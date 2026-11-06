@@ -1,0 +1,22 @@
+penult.store
+============
+
+.. automodule:: penult.store
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DEFAULT_PREFERENCES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      data_dir
+      preferences
+      set_preference
+      text_files
+      write_preferences
+   

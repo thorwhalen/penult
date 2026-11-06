@@ -1,0 +1,19 @@
+penult.tools
+============
+
+.. automodule:: penult.tools
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      HIDDEN_PARAMETERS
+      TOOLS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      without
+   

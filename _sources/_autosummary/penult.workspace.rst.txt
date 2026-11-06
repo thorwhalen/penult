@@ -1,0 +1,20 @@
+penult.workspace
+================
+
+.. automodule:: penult.workspace
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      is_thin
+      slug_of
+      word_count
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Workspace
+   

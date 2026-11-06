@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="purple" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>penult</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API reference" href="api.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="penult"/>
+    <meta name="twitter:card" content="summary"/>
+  
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="#">
+      
+      
+      <strong>penult</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/thorwhalen/penult" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/penult.html">penult</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.base.html">penult.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.github.html">penult.github</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.images.html">penult.images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.store.html">penult.store</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.tools.html">penult.tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.workspace.html">penult.workspace</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ai-agents.html">For AI agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#what-penult-holds-and-what-the-agent-does">What penult holds, and what the agent does</a></li>
+<li><a class="reference internal" href="#your-preferences-stay-private">Your preferences stay private</a></li>
+<li><a class="reference internal" href="#from-python">From Python</a></li>
+<li><a class="reference internal" href="#install-the-skill">Install the skill</a></li>
+<li><a class="reference internal" href="#related">Related</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="#"><span itemprop="name">penult</span></a>
+        <meta itemprop="position" content="1" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <!-- generated by epythet -->
+<section id="penult">
+<h1>penult<a class="headerlink" href="#penult" title="Link to this heading">#</a></h1>
+<p>From an idea to a publication draft: the penultimate step, where the essay exists, is illustrated, sounds like its author, and waits for them to say go.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pip<span class="w"> </span>install<span class="w"> </span>penult
+</span></pre></div>
+</div>
+<p>The seed is a GitHub issue. An agent, with the <code class="docutils literal notranslate"><span class="pre">penult</span></code> skill, turns it into an essay posted as a comment on that issue for the author to review, and, once the author approves, into an <strong>unpublished</strong> Substack or Medium draft through <a class="reference external" href="https://github.com/thorwhalen/article">article</a>. penult never publishes to a platform; the draft is as public as the issue it is posted on.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">penult<span class="w"> </span>start<span class="w"> </span>https://github.com/you/essays/issues/30<span class="w">     </span><span class="c1"># workspace docs/&lt;slug&gt;/ in the repo: seed.md, brief.md, state</span>
+</span><span data-line="2">penult<span class="w"> </span>status<span class="w"> </span>docs/&lt;slug&gt;<span class="w">                                 </span><span class="c1"># stage, files, what comes next</span>
+</span><span data-line="3">penult<span class="w"> </span>check<span class="w"> </span>docs/&lt;slug&gt;<span class="w">                                  </span><span class="c1"># ductus + penlike over essay.md; the report goes under ~/.local/share/penult, not the repo</span>
+</span><span data-line="4">penult<span class="w"> </span>image-search<span class="w"> </span><span class="s2">"a 1995 modem"</span><span class="w"> </span>--folder<span class="w"> </span>docs/&lt;slug&gt;<span class="w">   </span><span class="c1"># credited stock / public-domain candidates</span>
+</span><span data-line="5">penult<span class="w"> </span>image-generate<span class="w"> </span><span class="s2">"&lt;prompt&gt;"</span><span class="w"> </span>--name<span class="w"> </span>hero<span class="w"> </span>--folder<span class="w"> </span>docs/&lt;slug&gt;<span class="w">   </span><span class="c1"># at most 2 automatically; prompts past that are kept for you</span>
+</span><span data-line="6">penult<span class="w"> </span>render<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>penult<span class="w"> </span>post<span class="w"> </span>docs/&lt;slug&gt;<span class="w">      </span><span class="c1"># the essay as an issue comment, images by raw URL</span>
+</span><span data-line="7">penult<span class="w"> </span>approve<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span>--note<span class="w"> </span><span class="s2">"good to go"</span><span class="w">            </span><span class="c1"># the author's words; this gates publishing</span>
+</span><span data-line="8">penult<span class="w"> </span>publish<span class="w"> </span>docs/&lt;slug&gt;<span class="w">                                </span><span class="c1"># an unpublished Substack draft; you press Publish</span>
+</span></pre></div>
+</div>
+<section id="what-penult-holds-and-what-the-agent-does">
+<h2>What penult holds, and what the agent does<a class="headerlink" href="#what-penult-holds-and-what-the-agent-does" title="Link to this heading">#</a></h2>
+<p>The thinking is the agent’s: the research that checks every claim and finds the critiques, the draft, the passes that make it sound like the author. The <code class="docutils literal notranslate"><span class="pre">penult</span></code> skill lays that out and names the skills that own each step (<code class="docutils literal notranslate"><span class="pre">do-research</span></code>, <code class="docutils literal notranslate"><span class="pre">penlike</span></code> and its author-choice guide, <code class="docutils literal notranslate"><span class="pre">deslop</span></code>, <code class="docutils literal notranslate"><span class="pre">ductus</span></code>, <code class="docutils literal notranslate"><span class="pre">illustration</span></code>).</p>
+<p>penult holds what should not be improvised twice:</p>
+<ul class="simple">
+<li><p><strong>the workspace</strong>: <code class="docutils literal notranslate"><span class="pre">docs/&lt;slug&gt;/</span></code> next to the issue, with the seed as fetched, the brief (angle, audience, voice, platform, image budget, assumptions), the research notes, <code class="docutils literal notranslate"><span class="pre">essay.md</span></code>, <code class="docutils literal notranslate"><span class="pre">images.md</span></code> with every candidate, prompt and credit, <code class="docutils literal notranslate"><span class="pre">img/</span></code>, and a state file;</p></li>
+<li><p><strong>the thin-seed gate</strong>: a seed with no thesis or too few words is reported, and the agent asks the author before researching;</p></li>
+<li><p><strong>the image budget</strong>: paid generation capped per essay (two by default); every prompt is kept so the author can try the rest by hand;</p></li>
+<li><p><strong>the review loop</strong>: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs, captions kept), posted and updated in place, refusing while an image is not pushed;</p></li>
+<li><p><strong>the approval gate</strong>: <code class="docutils literal notranslate"><span class="pre">publish</span></code> runs only after <code class="docutils literal notranslate"><span class="pre">approve</span></code>, of the exact text that was posted, and only makes a draft; images in the comment are pinned to the pushed commit so the links outlive the branch.</p></li>
+</ul>
+</section>
+<section id="your-preferences-stay-private">
+<h2>Your preferences stay private<a class="headerlink" href="#your-preferences-stay-private" title="Link to this heading">#</a></h2>
+<p>Voices, platform, image budget, where the <code class="docutils literal notranslate"><span class="pre">article</span></code> credentials file is: <code class="docutils literal notranslate"><span class="pre">penult</span> <span class="pre">prefs</span></code> shows them, <code class="docutils literal notranslate"><span class="pre">penult</span> <span class="pre">prefs-set</span> <span class="pre">&lt;key&gt;</span> <span class="pre">&lt;value&gt;</span></code> changes one. They live under <code class="docutils literal notranslate"><span class="pre">~/.local/share/penult</span></code> (set <code class="docutils literal notranslate"><span class="pre">PENULT_DATA_DIR</span></code> to move it), never in a project folder. Credentials are never read by penult itself; <code class="docutils literal notranslate"><span class="pre">publish</span></code> hands the path of the credentials file to <code class="docutils literal notranslate"><span class="pre">article</span></code>.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Preference</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">voice_models</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;me&quot;]</span></code></p></td>
+<td><p>the penlike models the style pass writes with; the first is the base voice</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">voice_register</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">essay</span></code></p></td>
+<td><p>the penlike register to measure against</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">audience</span></code></p></td>
+<td><p>non-technical readers, or software engineers, managers and scientists</p></td>
+<td><p>narrowed per essay in the brief</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">platform</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">substack</span></code></p></td>
+<td><p>where <code class="docutils literal notranslate"><span class="pre">publish</span></code> sends the approved essay (<code class="docutils literal notranslate"><span class="pre">substack</span></code> or <code class="docutils literal notranslate"><span class="pre">medium</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_generated_images</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td><p>paid images generated automatically per essay</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">min_image_prompts</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p></td>
+<td><p>prompts the agent writes into <code class="docutils literal notranslate"><span class="pre">images.md</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">article_env_file</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">~/.config/article/.env</span></code></p></td>
+<td><p>the <code class="docutils literal notranslate"><span class="pre">article</span></code> credentials file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">article_state_path</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">~/.local/share/article/pipeline_state.json</span></code></p></td>
+<td><p>the <code class="docutils literal notranslate"><span class="pre">article</span></code> state file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">workspace</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">docs/{slug}</span></code></p></td>
+<td><p>where a workspace goes in the issue’s repository</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">research_depth</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">deep</span></code></p></td>
+<td><p>the <code class="docutils literal notranslate"><span class="pre">do-research</span></code> depth</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="from-python">
+<h2>From Python<a class="headerlink" href="#from-python" title="Link to this heading">#</a></h2>
+<p>Every command is a function in <code class="docutils literal notranslate"><span class="pre">penult.tools</span></code>, taking and returning JSON-ready values. The in-memory store (<code class="docutils literal notranslate"><span class="pre">files=</span></code>), the issue fetcher (<code class="docutils literal notranslate"><span class="pre">fetch=</span></code>), the command runner (<code class="docutils literal notranslate"><span class="pre">runner=</span></code>), the image searcher and generator (<code class="docutils literal notranslate"><span class="pre">searcher=</span></code>, <code class="docutils literal notranslate"><span class="pre">generator=</span></code>) are keyword arguments, which is how the tests run without a network:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">penult</span>
+</span><span data-line="2"><span class="n">started</span> <span class="o">=</span> <span class="n">penult</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="s2">"https://github.com/you/essays/issues/30"</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="s2">"docs/my-essay"</span><span class="p">)</span>
+</span><span data-line="3"><span class="n">penult</span><span class="o">.</span><span class="n">image_generate</span><span class="p">(</span><span class="s2">"a woodcut of a modem"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"hero"</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s2">"docs/my-essay"</span><span class="p">)</span>
+</span><span data-line="4"><span class="n">penult</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">"docs/my-essay"</span><span class="p">);</span> <span class="n">penult</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"docs/my-essay"</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="install-the-skill">
+<h2>Install the skill<a class="headerlink" href="#install-the-skill" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">gh<span class="w"> </span>skill<span class="w"> </span>install<span class="w"> </span>thorwhalen/penult<span class="w"> </span>penult<span class="w"> </span>--agent<span class="w"> </span>claude-code<span class="w">   </span><span class="c1"># needs a GitHub CLI with `gh skill`</span>
+</span></pre></div>
+</div>
+<p>Or copy (or symlink) <code class="docutils literal notranslate"><span class="pre">penult/data/skills/penult/</span></code> into your agent’s skills folder; it ships with the package. Extras: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'penult[publish]'</span></code> for the Substack step, <code class="docutils literal notranslate"><span class="pre">'penult[images]'</span></code> for search and generation, <code class="docutils literal notranslate"><span class="pre">'penult[style]'</span></code> for the checks.</p>
+</section>
+<section id="related">
+<h2>Related<a class="headerlink" href="#related" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/thorwhalen/article">article</a>: Markdown to an unpublished Substack draft, and syndication with canonical URLs. penult’s publishing step.</p></li>
+<li><p><a class="reference external" href="https://github.com/thorwhalen/penlike">penlike</a>: how an author writes, and the author-choice guide (<code class="docutils literal notranslate"><span class="pre">penlike</span> <span class="pre">guide</span></code>).</p></li>
+<li><p><a class="reference external" href="https://github.com/thorwhalen/ductus">ductus</a>: which passages read as machine-written, and why.</p></li>
+<li><p><a class="reference external" href="https://github.com/thorwhalen/illustration">illustration</a>: existing images with licence and attribution.</p></li>
+</ul>
+<p class="epythet-aggregates">This documentation as a single file: <a href="penult.md">penult.md</a> (Markdown, for agents).</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-06 10:56 UTC from <a href="https://github.com/thorwhalen/penult/commit/07a1d383aab478f1531c39e0adaa5b90f4981bf1">07a1d38</a> (main) · penult 0.0.1 · <a href="about-this-build.html">about this build</a></p>
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-next">
+    <a href="api.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">API reference</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/thorwhalen/penult" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/shibuya.js?v=50760d75"></script></body>
+</html>

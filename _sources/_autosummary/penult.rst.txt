@@ -1,0 +1,50 @@
+﻿penult
+======
+
+.. automodule:: penult
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      approve
+      check
+      data_dir
+      image_add
+      image_generate
+      image_search
+      mark
+      post
+      preferences
+      prefs
+      prefs_set
+      publish
+      render
+      start
+      status
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Workspace
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      PenultError
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   base
+   github
+   images
+   store
+   tools
+   workspace

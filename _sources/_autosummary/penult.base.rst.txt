@@ -1,0 +1,25 @@
+penult.base
+===========
+
+.. automodule:: penult.base
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      THIN_SEED_WORDS
+      STAGES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      stage_index
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      PenultError
+   

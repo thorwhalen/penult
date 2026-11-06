@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="purple" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>penult.images - penult</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="penult.store" href="penult.store.html" /><link rel="prev" title="penult.github" href="penult.github.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="penult.images"/>
+    <meta name="twitter:card" content="summary"/>
+  
+<link rel="alternate" type="text/markdown" href="penult.images.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>penult</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/thorwhalen/penult" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="penult.html">penult</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="penult.base.html">penult.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="penult.github.html">penult.github</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">penult.images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="penult.store.html">penult.store</a></li>
+<li class="toctree-l3"><a class="reference internal" href="penult.tools.html">penult.tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="penult.workspace.html">penult.workspace</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#penult.images.add_image"><code class="docutils literal notranslate"><span class="pre">add_image()</span></code></a></li>
+<li><a class="reference internal" href="#penult.images.credit_line"><code class="docutils literal notranslate"><span class="pre">credit_line()</span></code></a></li>
+<li><a class="reference internal" href="#penult.images.default_generator"><code class="docutils literal notranslate"><span class="pre">default_generator()</span></code></a></li>
+<li><a class="reference internal" href="#penult.images.default_searcher"><code class="docutils literal notranslate"><span class="pre">default_searcher()</span></code></a></li>
+<li><a class="reference internal" href="#penult.images.generate_image"><code class="docutils literal notranslate"><span class="pre">generate_image()</span></code></a></li>
+<li><a class="reference internal" href="#penult.images.search_images"><code class="docutils literal notranslate"><span class="pre">search_images()</span></code></a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">penult</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../api.html"><span itemprop="name">API reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="penult.html"><span itemprop="name">penult</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="3" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">penult.images</strong>
+        <meta itemprop="position" content="4" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <section id="module-penult.images">
+<span id="penult-images"></span><h1>penult.images<a class="headerlink" href="#module-penult.images" title="Link to this heading">#</a></h1>
+<p>Images for the essay: find existing ones, generate a few, and keep the ledger.</p>
+<p>Three sources, one ledger (<code class="docutils literal notranslate"><span class="pre">images.md</span></code> in the workspace, mirrored in the state):</p>
+<ul class="simple">
+<li><p><strong>search</strong>: existing stock, Creative-Commons and public-domain images through the
+<code class="docutils literal notranslate"><span class="pre">illustration</span></code> package, which carries licence and attribution with each hit;</p></li>
+<li><p><strong>generate</strong>: a paid image from a prompt through <code class="docutils literal notranslate"><span class="pre">aix.image.generate_image</span></code>,
+capped by the person’s <code class="docutils literal notranslate"><span class="pre">max_generated_images</span></code> so that an off prompt does not
+cost much; every prompt is kept in the ledger whether or not it was run;</p></li>
+<li><p><strong>add</strong>: an image the person made or found themselves, with its credit.</p></li>
+</ul>
+<p>The searcher and the generator are seams: any callable of the same shape works, and
+tests pass fakes.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">credit_line</span><span class="p">({</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Harbour"</span><span class="p">,</span> <span class="s2">"author"</span><span class="p">:</span> <span class="s2">"A. Painter"</span><span class="p">,</span> <span class="s2">"license"</span><span class="p">:</span> <span class="s2">"cc-by"</span><span class="p">,</span> <span class="s2">"source"</span><span class="p">:</span> <span class="s2">"openverse"</span><span class="p">})</span>
+</span><span data-line="2"><span class="go">'Harbour, by A. Painter (cc-by, via openverse)'</span>
+</span></pre></div>
+</div>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.images.add_image" title="penult.images.add_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_image</span></code></a>(ws, source, *, name, credit[, ...])</p></td>
+<td><p>Put an image in <code class="docutils literal notranslate"><span class="pre">img/</span></code> (from a URL or a local path) and record its credit.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.images.credit_line" title="penult.images.credit_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">credit_line</span></code></a>(record)</p></td>
+<td><p>A one-line credit from a record: the attribution if the source gave one, else built.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.images.default_generator" title="penult.images.default_generator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_generator</span></code></a>(prompt, *, path, **options)</p></td>
+<td><p>Generate one image with <code class="docutils literal notranslate"><span class="pre">aix</span></code> (DALL-E 3 and other litellm providers) and save it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.images.default_searcher" title="penult.images.default_searcher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_searcher</span></code></a>(query, *[, n])</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">illustration</span></code> package's unified search (Openverse by default, no key needed).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.images.generate_image" title="penult.images.generate_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_image</span></code></a>(ws, prompt, *, name, ...[, ...])</p></td>
+<td><p>Generate one image from <code class="docutils literal notranslate"><span class="pre">prompt</span></code> into <code class="docutils literal notranslate"><span class="pre">img/</span></code>, within the budget.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.images.search_images" title="penult.images.search_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_images</span></code></a>(ws, query, *[, n, searcher])</p></td>
+<td><p>Find existing images for <code class="docutils literal notranslate"><span class="pre">query</span></code> and record the candidates in the ledger.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.images.add_image">
+<span class="sig-prename descclassname"><span class="pre">penult.images.</span></span><span class="sig-name descname"><span class="pre">add_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">credit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">license</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/images.html#add_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.images.add_image" title="Link to this definition">#</a></dt>
+<dd><p>Put an image in <code class="docutils literal notranslate"><span class="pre">img/</span></code> (from a URL or a local path) and record its credit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.images.credit_line">
+<span class="sig-prename descclassname"><span class="pre">penult.images.</span></span><span class="sig-name descname"><span class="pre">credit_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/images.html#credit_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.images.credit_line" title="Link to this definition">#</a></dt>
+<dd><p>A one-line credit from a record: the attribution if the source gave one, else built.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.images.default_generator">
+<span class="sig-prename descclassname"><span class="pre">penult.images.</span></span><span class="sig-name descname"><span class="pre">default_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/images.html#default_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.images.default_generator" title="Link to this definition">#</a></dt>
+<dd><p>Generate one image with <code class="docutils literal notranslate"><span class="pre">aix</span></code> (DALL-E 3 and other litellm providers) and save it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.images.default_searcher">
+<span class="sig-prename descclassname"><span class="pre">penult.images.</span></span><span class="sig-name descname"><span class="pre">default_searcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/images.html#default_searcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.images.default_searcher" title="Link to this definition">#</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">illustration</span></code> package’s unified search (Openverse by default, no key needed).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.images.generate_image">
+<span class="sig-prename descclassname"><span class="pre">penult.images.</span></span><span class="sig-name descname"><span class="pre">generate_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_generated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/images.html#generate_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.images.generate_image" title="Link to this definition">#</a></dt>
+<dd><p>Generate one image from <code class="docutils literal notranslate"><span class="pre">prompt</span></code> into <code class="docutils literal notranslate"><span class="pre">img/</span></code>, within the budget.</p>
+<p>The budget counts images this workspace generated automatically. Past it, the
+prompt is recorded for the person to try by hand and nothing is spent, unless
+<code class="docutils literal notranslate"><span class="pre">force</span></code> is set (the person asked for this one).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.images.search_images">
+<span class="sig-prename descclassname"><span class="pre">penult.images.</span></span><span class="sig-name descname"><span class="pre">search_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">searcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/images.html#search_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.images.search_images" title="Link to this definition">#</a></dt>
+<dd><p>Find existing images for <code class="docutils literal notranslate"><span class="pre">query</span></code> and record the candidates in the ledger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="penult.github.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">penult.github</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="penult.store.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">penult.store</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/thorwhalen/penult" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

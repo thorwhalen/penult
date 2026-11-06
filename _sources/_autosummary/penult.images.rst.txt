@@ -1,0 +1,17 @@
+penult.images
+=============
+
+.. automodule:: penult.images
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_image
+      credit_line
+      default_generator
+      default_searcher
+      generate_image
+      search_images
+   

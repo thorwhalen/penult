@@ -1,0 +1,18 @@
+penult.github
+=============
+
+.. automodule:: penult.github
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      edit_comment
+      fetch_issue
+      parse_issue_url
+      post_comment
+      raw_url_base
+      repo_of_checkout
+      unpushed
+   
