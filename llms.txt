@@ -15,7 +15,7 @@
 - [penult.tools](_autosummary/penult.tools.html.md): The verbs: plain functions, JSON-ready in and out, the one list every surface is built from.
 - [penult.workspace](_autosummary/penult.workspace.html.md): One essay’s workspace: its files, its state, and the seed and brief written into it.
 - [For AI agents](ai-agents.html.md): &#96;penult&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-06 10:56 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-06 11:12 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

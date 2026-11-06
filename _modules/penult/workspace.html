@@ -367,55 +367,54 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="213"><span class="sd">    seed is thin, from the seed and these preferences otherwise), and the decisions</span>
 </span><span data-line="214"><span class="sd">    stay here so a later session can see what was assumed.</span>
 </span><span data-line="215"><span class="sd">    """</span>
-</span><span data-line="216">    <span class="n">voice</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"voice_models"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">"me"</span><span class="p">])</span>
-</span><span data-line="217">    <span class="n">verdict</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="218">        <span class="s2">"THIN: ask the user first ("</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">thin</span><span class="p">[</span><span class="s2">"reasons"</span><span class="p">])</span> <span class="o">+</span> <span class="s2">"), with a recommendation for each question."</span>
-</span><span data-line="219">        <span class="k">if</span> <span class="n">thin</span><span class="p">[</span><span class="s2">"thin"</span><span class="p">]</span>
-</span><span data-line="220">        <span class="k">else</span> <span class="sa">f</span><span class="s2">"rich enough (</span><span class="si">{</span><span class="n">thin</span><span class="p">[</span><span class="s1">'words'</span><span class="p">]</span><span class="si">}</span><span class="s2"> words): decide the open lines below from the seed and record the assumptions."</span>
-</span><span data-line="221">    <span class="p">)</span>
-</span><span data-line="222">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span data-line="223">        <span class="p">[</span>
-</span><span data-line="224">            <span class="sa">f</span><span class="s2">"# Brief: </span><span class="si">{</span><span class="n">issue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span data-line="225">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="226">            <span class="sa">f</span><span class="s2">"Seed: </span><span class="si">{</span><span class="n">issue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'url'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">. Seed verdict: </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span data-line="227">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="228">            <span class="s2">"## What the essay argues"</span><span class="p">,</span>
-</span><span data-line="229">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="230">            <span class="s2">"[DECIDE: the thesis in one or two sentences, in the author's words where the seed has them]"</span><span class="p">,</span>
-</span><span data-line="231">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="232">            <span class="s2">"## Angle and shape"</span><span class="p">,</span>
-</span><span data-line="233">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="234">            <span class="s2">"[DECIDE: what the essay is (an argument, a story and its moral, a debunking, a field guide), its length, and what it is not: never a report unless asked]"</span><span class="p">,</span>
-</span><span data-line="235">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="236">            <span class="s2">"## Audience"</span><span class="p">,</span>
-</span><span data-line="237">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="238">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'audience'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2"> [DECIDE: narrow this for this essay]"</span><span class="p">,</span>
-</span><span data-line="239">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="240">            <span class="s2">"## Voice"</span><span class="p">,</span>
-</span><span data-line="241">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="242">            <span class="sa">f</span><span class="s2">"Base voice: `</span><span class="si">{</span><span class="n">voice</span><span class="si">}</span><span class="s2">` (penlike register `</span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'voice_register'</span><span class="p">,</span><span class="w"> </span><span class="s1">'essay'</span><span class="p">)</span><span class="si">}</span><span class="s2">`). "</span>
-</span><span data-line="243">            <span class="s2">"Other authors: chosen with `penlike guide` for this subject. [DECIDE: which, for which passages]"</span><span class="p">,</span>
-</span><span data-line="244">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="245">            <span class="s2">"## Research"</span><span class="p">,</span>
-</span><span data-line="246">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="247">            <span class="sa">f</span><span class="s2">"Depth: </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'research_depth'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deep'</span><span class="p">)</span><span class="si">}</span><span class="s2">. Every claim in the seed is checked; critiques and counter-evidence are gathered so the essay knows both sides; "</span>
-</span><span data-line="248">            <span class="s2">"candidate figures, tables and images are indexed with their licence. Notes go in `research/`, Vancouver references, never in the essay's format."</span><span class="p">,</span>
-</span><span data-line="249">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="250">            <span class="s2">"## Images"</span><span class="p">,</span>
-</span><span data-line="251">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="252">            <span class="sa">f</span><span class="s2">"At least </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'min_image_prompts'</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2"> prompts written to `images.md`; at most </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'max_generated_images'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> generated automatically; stock and public-domain candidates found with `illustration`, credited. "</span>
-</span><span data-line="253">            <span class="s2">"[DECIDE: the visual style, if the seed or the user says]"</span><span class="p">,</span>
-</span><span data-line="254">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="255">            <span class="s2">"## Platform"</span><span class="p">,</span>
-</span><span data-line="256">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="257">            <span class="sa">f</span><span class="s2">"Default: </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'platform'</span><span class="p">,</span><span class="w"> </span><span class="s1">'substack'</span><span class="p">)</span><span class="si">}</span><span class="s2"> (an unpublished draft, after the user approves the issue-comment draft). [DECIDE: keep or change]"</span><span class="p">,</span>
-</span><span data-line="258">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="259">            <span class="s2">"## Assumptions and questions"</span><span class="p">,</span>
-</span><span data-line="260">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="261">            <span class="s2">"[the agent's assumptions, and the questions it asked the user, with the answers]"</span><span class="p">,</span>
-</span><span data-line="262">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="263">        <span class="p">]</span>
-</span><span data-line="264">    <span class="p">)</span>
+</span><span data-line="216">    <span class="n">verdict</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="217">        <span class="s2">"THIN: ask the user first ("</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">thin</span><span class="p">[</span><span class="s2">"reasons"</span><span class="p">])</span> <span class="o">+</span> <span class="s2">"), with a recommendation for each question."</span>
+</span><span data-line="218">        <span class="k">if</span> <span class="n">thin</span><span class="p">[</span><span class="s2">"thin"</span><span class="p">]</span>
+</span><span data-line="219">        <span class="k">else</span> <span class="sa">f</span><span class="s2">"rich enough (</span><span class="si">{</span><span class="n">thin</span><span class="p">[</span><span class="s1">'words'</span><span class="p">]</span><span class="si">}</span><span class="s2"> words): decide the open lines below from the seed and record the assumptions."</span>
+</span><span data-line="220">    <span class="p">)</span>
+</span><span data-line="221">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span data-line="222">        <span class="p">[</span>
+</span><span data-line="223">            <span class="sa">f</span><span class="s2">"# Brief: </span><span class="si">{</span><span class="n">issue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span data-line="224">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="225">            <span class="sa">f</span><span class="s2">"Seed: </span><span class="si">{</span><span class="n">issue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'url'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">. Seed verdict: </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span data-line="226">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="227">            <span class="s2">"## What the essay argues"</span><span class="p">,</span>
+</span><span data-line="228">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="229">            <span class="s2">"[DECIDE: the thesis in one or two sentences, in the author's words where the seed has them]"</span><span class="p">,</span>
+</span><span data-line="230">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="231">            <span class="s2">"## Angle and shape"</span><span class="p">,</span>
+</span><span data-line="232">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="233">            <span class="s2">"[DECIDE: what the essay is (an argument, a story and its moral, a debunking, a field guide), its length, and what it is not: never a report unless asked]"</span><span class="p">,</span>
+</span><span data-line="234">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="235">            <span class="s2">"## Audience"</span><span class="p">,</span>
+</span><span data-line="236">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="237">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'audience'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2"> [DECIDE: narrow this for this essay]"</span><span class="p">,</span>
+</span><span data-line="238">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="239">            <span class="s2">"## Voice"</span><span class="p">,</span>
+</span><span data-line="240">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="241">            <span class="sa">f</span><span class="s2">"Base voice: the author's own (penlike register `</span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'voice_register'</span><span class="p">,</span><span class="w"> </span><span class="s1">'essay'</span><span class="p">)</span><span class="si">}</span><span class="s2">`); other voices chosen with `penlike guide` for this subject. "</span>
+</span><span data-line="242">            <span class="s2">"This file is committed with the essay, so name the *roles* a borrowed voice plays (an ironic aside, a deadpan numbers passage), never the models or the guide's contents. [DECIDE: which roles, for which passages]"</span><span class="p">,</span>
+</span><span data-line="243">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="244">            <span class="s2">"## Research"</span><span class="p">,</span>
+</span><span data-line="245">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="246">            <span class="sa">f</span><span class="s2">"Depth: </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'research_depth'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deep'</span><span class="p">)</span><span class="si">}</span><span class="s2">. Every claim in the seed is checked; critiques and counter-evidence are gathered so the essay knows both sides; "</span>
+</span><span data-line="247">            <span class="s2">"candidate figures, tables and images are indexed with their licence. Notes go in `research/`, Vancouver references, never in the essay's format."</span><span class="p">,</span>
+</span><span data-line="248">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="249">            <span class="s2">"## Images"</span><span class="p">,</span>
+</span><span data-line="250">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="251">            <span class="sa">f</span><span class="s2">"At least </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'min_image_prompts'</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2"> prompts written to `images.md`; at most </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'max_generated_images'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> generated automatically; stock and public-domain candidates found with `illustration`, credited. "</span>
+</span><span data-line="252">            <span class="s2">"[DECIDE: the visual style, if the seed or the user says]"</span><span class="p">,</span>
+</span><span data-line="253">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="254">            <span class="s2">"## Platform"</span><span class="p">,</span>
+</span><span data-line="255">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="256">            <span class="sa">f</span><span class="s2">"Default: </span><span class="si">{</span><span class="n">prefs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'platform'</span><span class="p">,</span><span class="w"> </span><span class="s1">'substack'</span><span class="p">)</span><span class="si">}</span><span class="s2"> (an unpublished draft, after the user approves the issue-comment draft). [DECIDE: keep or change]"</span><span class="p">,</span>
+</span><span data-line="257">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="258">            <span class="s2">"## Assumptions and questions"</span><span class="p">,</span>
+</span><span data-line="259">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="260">            <span class="s2">"[the agent's assumptions, and the questions it asked the user, with the answers]"</span><span class="p">,</span>
+</span><span data-line="261">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="262">        <span class="p">]</span>
+</span><span data-line="263">    <span class="p">)</span>
 </span></pre></div>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
