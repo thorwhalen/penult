@@ -7,6 +7,7 @@
 
 - [penult](penult.html.md): penult: from an idea to a publication draft, posted where its author can review it.
 - [penult.base](penult.base.html.md): Errors, constants and the stage names shared across penult.
+- [penult.figures](penult.figures.html.md): Illustration layout: how big each image is drawn, and where, on every renderer.
 - [penult.github](penult.github.html.md): GitHub, through the &#96;gh&#96; and &#96;git&#96; commands: read an issue, post or edit a comment, find raw URLs.
 - [penult.images](penult.images.html.md): Images for the essay: find existing ones, generate a few, and keep the ledger.
 - [penult.store](penult.store.html.md): Where penult’s private data lives, and the preferences read from it.

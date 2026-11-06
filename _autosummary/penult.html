@@ -67,6 +67,7 @@ data-aria-dark="Switch to auto color mode">
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">penult</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="penult.base.html">penult.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="penult.figures.html">penult.figures</a></li>
 <li class="toctree-l3"><a class="reference internal" href="penult.github.html">penult.github</a></li>
 <li class="toctree-l3"><a class="reference internal" href="penult.images.html">penult.images</a></li>
 <li class="toctree-l3"><a class="reference internal" href="penult.store.html">penult.store</a></li>
@@ -107,6 +108,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#penult.image_add"><code class="docutils literal notranslate"><span class="pre">image_add()</span></code></a></li>
 <li><a class="reference internal" href="#penult.image_generate"><code class="docutils literal notranslate"><span class="pre">image_generate()</span></code></a></li>
 <li><a class="reference internal" href="#penult.image_search"><code class="docutils literal notranslate"><span class="pre">image_search()</span></code></a></li>
+<li><a class="reference internal" href="#penult.layout"><code class="docutils literal notranslate"><span class="pre">layout()</span></code></a></li>
 <li><a class="reference internal" href="#penult.mark"><code class="docutils literal notranslate"><span class="pre">mark()</span></code></a></li>
 <li><a class="reference internal" href="#penult.post"><code class="docutils literal notranslate"><span class="pre">post()</span></code></a></li>
 <li><a class="reference internal" href="#penult.preferences"><code class="docutils literal notranslate"><span class="pre">preferences()</span></code></a></li>
@@ -178,31 +180,34 @@ in the <code class="docutils literal notranslate"><span class="pre">penult</span
 <tr class="row-even"><td><p><a class="reference internal" href="#penult.image_search" title="penult.image_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image_search</span></code></a>(query, *[, folder, n, searcher])</p></td>
 <td><p>Find existing stock, Creative-Commons or public-domain images for <code class="docutils literal notranslate"><span class="pre">query</span></code>, credited.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.mark" title="penult.mark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark</span></code></a>([folder])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.layout" title="penult.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a>([folder, apply])</p></td>
+<td><p>Each image's size class against the layout rules; <code class="docutils literal notranslate"><span class="pre">--apply</span></code> writes the suggestions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.mark" title="penult.mark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark</span></code></a>([folder])</p></td>
 <td><p>Record that the workspace reached <code class="docutils literal notranslate"><span class="pre">stage</span></code> (researched, drafted, styled, illustrated).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#penult.post" title="penult.post"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post</span></code></a>([folder, new, runner])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.post" title="penult.post"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post</span></code></a>([folder, new, runner])</p></td>
 <td><p>Post comment.md on the issue (or update the comment posted last time; <code class="docutils literal notranslate"><span class="pre">--new</span></code> posts another).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.preferences" title="penult.preferences"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preferences</span></code></a>(*[, data_dir, files])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.preferences" title="penult.preferences"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preferences</span></code></a>(*[, data_dir, files])</p></td>
 <td><p>The preferences: the defaults, overlaid with what the person wrote.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#penult.prefs" title="penult.prefs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefs</span></code></a>(*[, data_dir, files])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.prefs" title="penult.prefs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefs</span></code></a>(*[, data_dir, files])</p></td>
 <td><p>The private preferences (defaults overlaid with what the person set).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.prefs_set" title="penult.prefs_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefs_set</span></code></a>(key, value, *[, data_dir, files])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.prefs_set" title="penult.prefs_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefs_set</span></code></a>(key, value, *[, data_dir, files])</p></td>
 <td><p>Set one preference; the value must have the default's type (<code class="docutils literal notranslate"><span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">'[&quot;me&quot;,&quot;dfw&quot;]'</span></code>, text).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#penult.publish" title="penult.publish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">publish</span></code></a>([folder, platform, dry_run, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.publish" title="penult.publish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">publish</span></code></a>([folder, platform, dry_run, ...])</p></td>
 <td><p>Hand the approved essay to the publisher for an <strong>unpublished</strong> draft on the platform.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.render" title="penult.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a>([folder, raw_base, runner])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.render" title="penult.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a>([folder, raw_base, data_dir, files, ...])</p></td>
 <td><p>Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#penult.start" title="penult.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>(seed, *[, into, force, data_dir, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.start" title="penult.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>(seed, *[, into, force, data_dir, ...])</p></td>
 <td><p>Fetch the seed (a GitHub issue URL) and make the workspace: seed, brief, state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.status" title="penult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>([folder])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.status" title="penult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>([folder])</p></td>
 <td><p>Where the workspace stands: stage, files present, images, the posted comment, what comes next.</p></td>
 </tr>
 </tbody>
@@ -412,6 +417,24 @@ by hand; <code class="docutils literal notranslate"><span class="pre">--force</s
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="penult.layout">
+<span class="sig-prename descclassname"><span class="pre">penult.</span></span><span class="sig-name descname"><span class="pre">layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/tools.html#layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.layout" title="Link to this definition">#</a></dt>
+<dd><p>Each image’s size class against the layout rules; <code class="docutils literal notranslate"><span class="pre">--apply</span></code> writes the suggestions.</p>
+<p>The rules (<code class="docutils literal notranslate"><span class="pre">penult.figures</span></code>, from the layout research in <code class="docutils literal notranslate"><span class="pre">misc/docs/research/</span></code>):
+the hero is landscape at column width or an inset; a square or portrait body image
+is an inset; a landscape one, a diagram or a chart takes the column; after the hero,
+about one image per 500 words at most. The class goes in essay.md’s <code class="docutils literal notranslate"><span class="pre">images:</span></code>
+front matter, which <code class="docutils literal notranslate"><span class="pre">render</span></code> honours as <code class="docutils literal notranslate"><span class="pre">&lt;img</span> <span class="pre">width&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">publish</span></code> as
+python-substack’s image marker. <code class="docutils literal notranslate"><span class="pre">--apply</span></code> sets every unset image’s class to the
+suggestion (a class set by hand is kept; to change one, edit the front matter).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="penult.mark">
 <span class="sig-prename descclassname"><span class="pre">penult.</span></span><span class="sig-name descname"><span class="pre">mark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/tools.html#mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.mark" title="Link to this definition">#</a></dt>
 <dd><p>Record that the workspace reached <code class="docutils literal notranslate"><span class="pre">stage</span></code> (researched, drafted, styled, illustrated).</p>
@@ -486,7 +509,7 @@ the approval, unless <code class="docutils literal notranslate"><span class="pre
 
 <dl class="py function">
 <dt class="sig sig-object py" id="penult.render">
-<span class="sig-prename descclassname"><span class="pre">penult.</span></span><span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/tools.html#render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.render" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">penult.</span></span><span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/tools.html#render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.render" title="Link to this definition">#</a></dt>
 <dd><p>Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.</p>
 <p><code class="docutils literal notranslate"><span class="pre">raw_base</span></code> is worked out from the checkout (owner, repo, commit, folder) when
 not given; pinning the commit keeps the links alive after the branch is merged.
@@ -532,19 +555,22 @@ an existing workspace; the brief and the stage are kept.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="penult.base.html#module-penult.base" title="penult.base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code></a></p></td>
 <td><p>Errors, constants and the stage names shared across penult.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="penult.github.html#module-penult.github" title="penult.github"><code class="xref py py-obj docutils literal notranslate"><span class="pre">github</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="penult.figures.html#module-penult.figures" title="penult.figures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">figures</span></code></a></p></td>
+<td><p>Illustration layout: how big each image is drawn, and where, on every renderer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="penult.github.html#module-penult.github" title="penult.github"><code class="xref py py-obj docutils literal notranslate"><span class="pre">github</span></code></a></p></td>
 <td><p>GitHub, through the <code class="docutils literal notranslate"><span class="pre">gh</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> commands: read an issue, post or edit a comment, find raw URLs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="penult.images.html#module-penult.images" title="penult.images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">images</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="penult.images.html#module-penult.images" title="penult.images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">images</span></code></a></p></td>
 <td><p>Images for the essay: find existing ones, generate a few, and keep the ledger.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="penult.store.html#module-penult.store" title="penult.store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">store</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="penult.store.html#module-penult.store" title="penult.store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">store</span></code></a></p></td>
 <td><p>Where penult's private data lives, and the preferences read from it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="penult.tools.html#module-penult.tools" title="penult.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="penult.tools.html#module-penult.tools" title="penult.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
 <td><p>The verbs: plain functions, JSON-ready in and out, the one list every surface is built from.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="penult.workspace.html#module-penult.workspace" title="penult.workspace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">workspace</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="penult.workspace.html#module-penult.workspace" title="penult.workspace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">workspace</span></code></a></p></td>
 <td><p>One essay's workspace: its files, its state, and the seed and brief written into it.</p></td>
 </tr>
 </tbody>
@@ -592,7 +618,7 @@ an existing workspace; the brief and the stage are kept.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/documentation_options.js?v=e3a6060d"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

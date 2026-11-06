@@ -42,7 +42,7 @@ touching the rest:
 | [`text_files`](#penult.store.text_files)(root)                                  | A `dol` files store under `root`: `/`-separated keys, UTF-8 text values.              |
 | [`write_preferences`](#penult.store.write_preferences)(values, \*[, data_dir, files])  | Replace the saved preferences (only the keys that differ from the defaults are kept). |
 
-### penult.store.DEFAULT_PREFERENCES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]* *= {'article_env_file': '~/.config/article/.env', 'article_state_path': '~/.local/share/article/pipeline_state.json', 'audience': 'non-technical readers, or software engineers, managers and scientists', 'max_generated_images': 2, 'min_image_prompts': 5, 'platform': 'substack', 'research_depth': 'deep', 'voice_models': ['me'], 'voice_register': 'essay', 'workspace': 'docs/{slug}'}*
+### penult.store.DEFAULT_PREFERENCES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]* *= {'article_env_file': '~/.config/article/.env', 'article_state_path': '~/.local/share/article/pipeline_state.json', 'audience': 'non-technical readers, or software engineers, managers and scientists', 'inset_width': 400, 'max_generated_images': 2, 'min_image_prompts': 5, 'platform': 'substack', 'research_depth': 'deep', 'voice_models': ['me'], 'voice_register': 'essay', 'workspace': 'docs/{slug}'}*
 
 The preferences every verb falls back to. A person changes them with
 `penult prefs-set`; an agent changes them only when the person said so.

@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-06T11:12:34Z",
+  "built_at": "2026-11-06T13:15:50Z",
   "package": {
     "name": "penult",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "display_name": "penult",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "69ca2ceb2589faa4b5cecbf4ea9447937ce4165a",
-    "short_commit": "69ca2ce",
+    "commit": "ab5a4da447d5c8a6785e5d06e1c0105614f2243c",
+    "short_commit": "ab5a4da",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/penult",
-    "commit_url": "https://github.com/thorwhalen/penult/commit/69ca2ceb2589faa4b5cecbf4ea9447937ce4165a",
+    "commit_url": "https://github.com/thorwhalen/penult/commit/ab5a4da447d5c8a6785e5d06e1c0105614f2243c",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/penult",
-    "sha": "69ca2ceb2589faa4b5cecbf4ea9447937ce4165a",
+    "sha": "ab5a4da447d5c8a6785e5d06e1c0105614f2243c",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "42208326967",
-    "run_url": "https://github.com/thorwhalen/penult/actions/runs/42208326967",
+    "run_id": "42223881027",
+    "run_url": "https://github.com/thorwhalen/penult/actions/runs/42223881027",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,16 +55,16 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 7,
-    "objects_documented": 63
+    "modules_documented": 8,
+    "objects_documented": 76
   },
   "pypi": {
     "checked": true,
-    "latest": null,
-    "relation": "unknown",
+    "latest": "0.0.2",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/penult && cd penult\ngit checkout 69ca2ceb2589faa4b5cecbf4ea9447937ce4165a\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/penult && cd penult\ngit checkout ab5a4da447d5c8a6785e5d06e1c0105614f2243c\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

@@ -14,6 +14,7 @@
       image_add
       image_generate
       image_search
+      layout
       mark
       post
       preferences
@@ -43,6 +44,7 @@
    :recursive:
 
    base
+   figures
    github
    images
    store

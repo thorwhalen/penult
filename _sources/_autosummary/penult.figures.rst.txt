@@ -1,0 +1,28 @@
+penult.figures
+==============
+
+.. automodule:: penult.figures
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SIZES
+      COLUMN_WIDTH
+      INSET_WIDTH
+      GITHUB_ATTRS
+      SUBSTACK_ATTRS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      describe_images
+      github_attrs
+      pixel_size
+      sizes_from_fields
+      substack_markdown
+      suggest_size
+      with_sizes
+   

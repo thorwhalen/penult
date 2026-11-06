@@ -9,13 +9,14 @@
 - [API reference](api.html.md): | &#96;penult&#96;   | penult: from an idea to a publication draft, posted where its author can review it.  ...
 - [penult](_autosummary/penult.html.md): penult: from an idea to a publication draft, posted where its author can review it.
 - [penult.base](_autosummary/penult.base.html.md): Errors, constants and the stage names shared across penult.
+- [penult.figures](_autosummary/penult.figures.html.md): Illustration layout: how big each image is drawn, and where, on every renderer.
 - [penult.github](_autosummary/penult.github.html.md): GitHub, through the &#96;gh&#96; and &#96;git&#96; commands: read an issue, post or edit a comment, find raw URLs.
 - [penult.images](_autosummary/penult.images.html.md): Images for the essay: find existing ones, generate a few, and keep the ledger.
 - [penult.store](_autosummary/penult.store.html.md): Where penult’s private data lives, and the preferences read from it.
 - [penult.tools](_autosummary/penult.tools.html.md): The verbs: plain functions, JSON-ready in and out, the one list every surface is built from.
 - [penult.workspace](_autosummary/penult.workspace.html.md): One essay’s workspace: its files, its state, and the seed and brief written into it.
 - [For AI agents](ai-agents.html.md): &#96;penult&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-06 11:12 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-06 13:15 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

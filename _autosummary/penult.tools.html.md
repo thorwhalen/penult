@@ -41,7 +41,7 @@ the injected callables are for Python callers and tests.
 * **Type:**
   Parameters a surface built from these signatures leaves out
 
-### penult.tools.TOOLS *= [<function start>, <function status>, <function mark>, <function check>, <function image_search>, <function image_generate>, <function image_add>, <function render>, <function post>, <function approve>, <function publish>, <function prefs>, <function prefs_set>]*
+### penult.tools.TOOLS *= [<function start>, <function status>, <function mark>, <function check>, <function image_search>, <function image_generate>, <function image_add>, <function layout>, <function render>, <function post>, <function approve>, <function publish>, <function prefs>, <function prefs_set>]*
 
 The one list every surface is built from. Never write a second one.
 

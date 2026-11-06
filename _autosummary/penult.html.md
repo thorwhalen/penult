@@ -24,13 +24,14 @@ in the `penult` skill; the verbs here keep every step from being improvised twic
 | [`image_add`](#penult.image_add)(source, \*, name, credit[, folder, ...]) | Add an image (a URL or a local file) to img/ with its credit; `--prompt` if a person generated it.  |
 | [`image_generate`](#penult.image_generate)(prompt, \*, name[, folder, ...])    | Generate one image from `prompt` into img/, within the `max_generated_images` budget.               |
 | [`image_search`](#penult.image_search)(query, \*[, folder, n, searcher])     | Find existing stock, Creative-Commons or public-domain images for `query`, credited.                |
+| [`layout`](#penult.layout)([folder, apply])                            | Each image's size class against the layout rules; `--apply` writes the suggestions.                 |
 | [`mark`](#penult.mark)([folder])                                     | Record that the workspace reached `stage` (researched, drafted, styled, illustrated).               |
 | [`post`](#penult.post)([folder, new, runner])                        | Post comment.md on the issue (or update the comment posted last time; `--new` posts another).       |
 | [`preferences`](#penult.preferences)(\*[, data_dir, files])                 | The preferences: the defaults, overlaid with what the person wrote.                                 |
 | [`prefs`](#penult.prefs)(\*[, data_dir, files])                       | The private preferences (defaults overlaid with what the person set).                               |
 | [`prefs_set`](#penult.prefs_set)(key, value, \*[, data_dir, files])       | Set one preference; the value must have the default's type (`2`, `'["me","dfw"]'`, text).           |
 | [`publish`](#penult.publish)([folder, platform, dry_run, ...])          | Hand the approved essay to the publisher for an **unpublished** draft on the platform.              |
-| [`render`](#penult.render)([folder, raw_base, runner])                 | Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.              |
+| [`render`](#penult.render)([folder, raw_base, data_dir, files, ...])   | Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.              |
 | [`start`](#penult.start)(seed, \*[, into, force, data_dir, ...])      | Fetch the seed (a GitHub issue URL) and make the workspace: seed, brief, state.                     |
 | [`status`](#penult.status)([folder])                                   | Where the workspace stands: stage, files present, images, the posted comment, what comes next.      |
 
@@ -174,6 +175,21 @@ Candidates are recorded in images.md. Download the one you use with
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
+### penult.layout(folder=None, , apply=False)
+
+Each image’s size class against the layout rules; `--apply` writes the suggestions.
+
+The rules (`penult.figures`, from the layout research in `misc/docs/research/`):
+the hero is landscape at column width or an inset; a square or portrait body image
+is an inset; a landscape one, a diagram or a chart takes the column; after the hero,
+about one image per 500 words at most. The class goes in essay.md’s `images:`
+front matter, which `render` honours as `<img width>` and `publish` as
+python-substack’s image marker. `--apply` sets every unset image’s class to the
+suggestion (a class set by hand is kept; to change one, edit the front matter).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### penult.mark(folder=None, , stage)
 
 Record that the workspace reached `stage` (researched, drafted, styled, illustrated).
@@ -225,7 +241,7 @@ the approval, unless `--dry-run` (which converts and checks, sending nothing).
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### penult.render(folder=None, \*, raw_base=None, runner=<function run>)
+### penult.render(folder=None, \*, raw_base=None, data_dir=None, files=None, runner=<function run>)
 
 Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.
 
@@ -260,6 +276,7 @@ Where the workspace stands: stage, files present, images, the posted comment, wh
 
 | [`base`](penult.base.html.md#module-penult.base)           | Errors, constants and the stage names shared across penult.                                        |
 |------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| [`figures`](penult.figures.html.md#module-penult.figures)     | Illustration layout: how big each image is drawn, and where, on every renderer.                    |
 | [`github`](penult.github.html.md#module-penult.github)       | GitHub, through the `gh` and `git` commands: read an issue, post or edit a comment, find raw URLs. |
 | [`images`](penult.images.html.md#module-penult.images)       | Images for the essay: find existing ones, generate a few, and keep the ledger.                     |
 | [`store`](penult.store.html.md#module-penult.store)         | Where penult's private data lives, and the preferences read from it.                               |

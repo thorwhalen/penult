@@ -67,6 +67,7 @@ data-aria-dark="Switch to auto color mode">
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="_autosummary/penult.html">penult</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.base.html">penult.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.figures.html">penult.figures</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.github.html">penult.github</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.images.html">penult.images</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/penult.store.html">penult.store</a></li>
@@ -133,9 +134,10 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="3">penult<span class="w"> </span>check<span class="w"> </span>docs/&lt;slug&gt;<span class="w">                                  </span><span class="c1"># ductus + penlike over essay.md; the report goes under ~/.local/share/penult, not the repo</span>
 </span><span data-line="4">penult<span class="w"> </span>image-search<span class="w"> </span><span class="s2">"a 1995 modem"</span><span class="w"> </span>--folder<span class="w"> </span>docs/&lt;slug&gt;<span class="w">   </span><span class="c1"># credited stock / public-domain candidates</span>
 </span><span data-line="5">penult<span class="w"> </span>image-generate<span class="w"> </span><span class="s2">"&lt;prompt&gt;"</span><span class="w"> </span>--name<span class="w"> </span>hero<span class="w"> </span>--folder<span class="w"> </span>docs/&lt;slug&gt;<span class="w">   </span><span class="c1"># at most 2 automatically; prompts past that are kept for you</span>
-</span><span data-line="6">penult<span class="w"> </span>render<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>penult<span class="w"> </span>post<span class="w"> </span>docs/&lt;slug&gt;<span class="w">      </span><span class="c1"># the essay as an issue comment, images by raw URL</span>
-</span><span data-line="7">penult<span class="w"> </span>approve<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span>--note<span class="w"> </span><span class="s2">"good to go"</span><span class="w">            </span><span class="c1"># the author's words; this gates publishing</span>
-</span><span data-line="8">penult<span class="w"> </span>publish<span class="w"> </span>docs/&lt;slug&gt;<span class="w">                                </span><span class="c1"># an unpublished Substack draft; you press Publish</span>
+</span><span data-line="6">penult<span class="w"> </span>layout<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span>--apply<span class="w">                         </span><span class="c1"># size class per image (a square hero becomes an inset), into the front matter</span>
+</span><span data-line="7">penult<span class="w"> </span>render<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>penult<span class="w"> </span>post<span class="w"> </span>docs/&lt;slug&gt;<span class="w">      </span><span class="c1"># the essay as an issue comment, images by raw URL</span>
+</span><span data-line="8">penult<span class="w"> </span>approve<span class="w"> </span>docs/&lt;slug&gt;<span class="w"> </span>--note<span class="w"> </span><span class="s2">"good to go"</span><span class="w">            </span><span class="c1"># the author's words; this gates publishing</span>
+</span><span data-line="9">penult<span class="w"> </span>publish<span class="w"> </span>docs/&lt;slug&gt;<span class="w">                                </span><span class="c1"># an unpublished Substack draft; you press Publish</span>
 </span></pre></div>
 </div>
 <section id="what-penult-holds-and-what-the-agent-does">
@@ -146,7 +148,8 @@ data-aria-dark="Switch to auto color mode">
 <li><p><strong>the workspace</strong>: <code class="docutils literal notranslate"><span class="pre">docs/&lt;slug&gt;/</span></code> next to the issue, with the seed as fetched, the brief (angle, audience, voice, platform, image budget, assumptions), the research notes, <code class="docutils literal notranslate"><span class="pre">essay.md</span></code>, <code class="docutils literal notranslate"><span class="pre">images.md</span></code> with every candidate, prompt and credit, <code class="docutils literal notranslate"><span class="pre">img/</span></code>, and a state file;</p></li>
 <li><p><strong>the thin-seed gate</strong>: a seed with no thesis or too few words is reported, and the agent asks the author before researching;</p></li>
 <li><p><strong>the image budget</strong>: paid generation capped per essay (two by default); every prompt is kept so the author can try the rest by hand;</p></li>
-<li><p><strong>the review loop</strong>: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs, captions kept), posted and updated in place, refusing while an image is not pushed;</p></li>
+<li><p><strong>the layout rules</strong>: each image has a size class (<code class="docutils literal notranslate"><span class="pre">inset</span></code>, <code class="docutils literal notranslate"><span class="pre">normal</span></code>, <code class="docutils literal notranslate"><span class="pre">large</span></code>, <code class="docutils literal notranslate"><span class="pre">full</span></code>) in <code class="docutils literal notranslate"><span class="pre">essay.md</span></code>’s front matter, suggested from its pixels by <code class="docutils literal notranslate"><span class="pre">penult</span> <span class="pre">layout</span></code> (a square or portrait image, or a non-landscape hero, is an inset; landscape, diagrams and charts take the column) and honoured both in the comment (<code class="docutils literal notranslate"><span class="pre">&lt;img</span> <span class="pre">width&gt;</span></code>) and on Substack (python-substack’s image marker); the research behind the rules is in <code class="docutils literal notranslate"><span class="pre">misc/docs/research/</span></code>;</p></li>
+<li><p><strong>the review loop</strong>: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs and sized, captions drawn small under them), posted and updated in place, refusing while an image is not pushed;</p></li>
 <li><p><strong>the approval gate</strong>: <code class="docutils literal notranslate"><span class="pre">publish</span></code> runs only after <code class="docutils literal notranslate"><span class="pre">approve</span></code>, of the exact text that was posted, and only makes a draft; images in the comment are pinned to the pushed commit so the links outlive the branch.</p></li>
 </ul>
 </section>
@@ -186,19 +189,23 @@ data-aria-dark="Switch to auto color mode">
 <td><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p></td>
 <td><p>prompts the agent writes into <code class="docutils literal notranslate"><span class="pre">images.md</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">article_env_file</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inset_width</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">400</span></code></p></td>
+<td><p>how wide an <code class="docutils literal notranslate"><span class="pre">inset</span></code> image is drawn, in CSS pixels, in the comment and on Substack</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">article_env_file</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">~/.config/article/.env</span></code></p></td>
 <td><p>the <code class="docutils literal notranslate"><span class="pre">article</span></code> credentials file</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">article_state_path</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">article_state_path</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">~/.local/share/article/pipeline_state.json</span></code></p></td>
 <td><p>the <code class="docutils literal notranslate"><span class="pre">article</span></code> state file</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">workspace</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">workspace</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">docs/{slug}</span></code></p></td>
 <td><p>where a workspace goes in the issue’s repository</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">research_depth</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">research_depth</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">deep</span></code></p></td>
 <td><p>the <code class="docutils literal notranslate"><span class="pre">do-research</span></code> depth</p></td>
 </tr>
@@ -237,7 +244,7 @@ data-aria-dark="Switch to auto color mode">
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-06 11:12 UTC from <a href="https://github.com/thorwhalen/penult/commit/69ca2ceb2589faa4b5cecbf4ea9447937ce4165a">69ca2ce</a> (main) · penult 0.0.1 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-06 13:15 UTC from <a href="https://github.com/thorwhalen/penult/commit/ab5a4da447d5c8a6785e5d06e1c0105614f2243c">ab5a4da</a> (main) · penult 0.0.2 · <a href="about-this-build.html">about this build</a></p>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
@@ -272,7 +279,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/documentation_options.js?v=e3a6060d"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>

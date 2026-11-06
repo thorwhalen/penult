@@ -1,4 +1,4 @@
-> built 2026-11-06 11:12 UTC from 69ca2ce (main) · penult 0.0.1. Details: build_info.json
+> built 2026-11-06 13:15 UTC from ab5a4da (main) · penult 0.0.2. Details: build_info.json
 
 # index.html.md
 
@@ -20,6 +20,7 @@ penult status docs/<slug>                                 # stage, files, what c
 penult check docs/<slug>                                  # ductus + penlike over essay.md; the report goes under ~/.local/share/penult, not the repo
 penult image-search "a 1995 modem" --folder docs/<slug>   # credited stock / public-domain candidates
 penult image-generate "<prompt>" --name hero --folder docs/<slug>   # at most 2 automatically; prompts past that are kept for you
+penult layout docs/<slug> --apply                         # size class per image (a square hero becomes an inset), into the front matter
 penult render docs/<slug> && penult post docs/<slug>      # the essay as an issue comment, images by raw URL
 penult approve docs/<slug> --note "good to go"            # the author's words; this gates publishing
 penult publish docs/<slug>                                # an unpublished Substack draft; you press Publish
@@ -34,25 +35,27 @@ penult holds what should not be improvised twice:
 - **the workspace**: `docs/<slug>/` next to the issue, with the seed as fetched, the brief (angle, audience, voice, platform, image budget, assumptions), the research notes, `essay.md`, `images.md` with every candidate, prompt and credit, `img/`, and a state file;
 - **the thin-seed gate**: a seed with no thesis or too few words is reported, and the agent asks the author before researching;
 - **the image budget**: paid generation capped per essay (two by default); every prompt is kept so the author can try the rest by hand;
-- **the review loop**: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs, captions kept), posted and updated in place, refusing while an image is not pushed;
+- **the layout rules**: each image has a size class (`inset`, `normal`, `large`, `full`) in `essay.md`’s front matter, suggested from its pixels by `penult layout` (a square or portrait image, or a non-landscape hero, is an inset; landscape, diagrams and charts take the column) and honoured both in the comment (`<img width>`) and on Substack (python-substack’s image marker); the research behind the rules is in `misc/docs/research/`;
+- **the review loop**: the essay rendered for a GitHub comment (title, subtitle, images turned into raw URLs and sized, captions drawn small under them), posted and updated in place, refusing while an image is not pushed;
 - **the approval gate**: `publish` runs only after `approve`, of the exact text that was posted, and only makes a draft; images in the comment are pinned to the pushed commit so the links outlive the branch.
 
 ## Your preferences stay private
 
 Voices, platform, image budget, where the `article` credentials file is: `penult prefs` shows them, `penult prefs-set <key> <value>` changes one. They live under `~/.local/share/penult` (set `PENULT_DATA_DIR` to move it), never in a project folder. Credentials are never read by penult itself; `publish` hands the path of the credentials file to `article`.
 
-| Preference             | Default                                                               | Meaning                                                                    |
-|------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------------|
-| `voice_models`         | `["me"]`                                                              | the penlike models the style pass writes with; the first is the base voice |
-| `voice_register`       | `essay`                                                               | the penlike register to measure against                                    |
-| `audience`             | non-technical readers, or software engineers, managers and scientists | narrowed per essay in the brief                                            |
-| `platform`             | `substack`                                                            | where `publish` sends the approved essay (`substack` or `medium`)          |
-| `max_generated_images` | `2`                                                                   | paid images generated automatically per essay                              |
-| `min_image_prompts`    | `5`                                                                   | prompts the agent writes into `images.md`                                  |
-| `article_env_file`     | `~/.config/article/.env`                                              | the `article` credentials file                                             |
-| `article_state_path`   | `~/.local/share/article/pipeline_state.json`                          | the `article` state file                                                   |
-| `workspace`            | `docs/{slug}`                                                         | where a workspace goes in the issue’s repository                           |
-| `research_depth`       | `deep`                                                                | the `do-research` depth                                                    |
+| Preference             | Default                                                               | Meaning                                                                           |
+|------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| `voice_models`         | `["me"]`                                                              | the penlike models the style pass writes with; the first is the base voice        |
+| `voice_register`       | `essay`                                                               | the penlike register to measure against                                           |
+| `audience`             | non-technical readers, or software engineers, managers and scientists | narrowed per essay in the brief                                                   |
+| `platform`             | `substack`                                                            | where `publish` sends the approved essay (`substack` or `medium`)                 |
+| `max_generated_images` | `2`                                                                   | paid images generated automatically per essay                                     |
+| `min_image_prompts`    | `5`                                                                   | prompts the agent writes into `images.md`                                         |
+| `inset_width`          | `400`                                                                 | how wide an `inset` image is drawn, in CSS pixels, in the comment and on Substack |
+| `article_env_file`     | `~/.config/article/.env`                                              | the `article` credentials file                                                    |
+| `article_state_path`   | `~/.local/share/article/pipeline_state.json`                          | the `article` state file                                                          |
+| `workspace`            | `docs/{slug}`                                                         | where a workspace goes in the issue’s repository                                  |
+| `research_depth`       | `deep`                                                                | the `do-research` depth                                                           |
 
 ## From Python
 
@@ -136,6 +139,184 @@ True
 
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+
+# _autosummary/penult.figures.html.md
+
+# penult.figures
+
+Illustration layout: how big each image is drawn, and where, on every renderer.
+
+The rules come from `misc/docs/research/2026-11-06-illustration-layout-for-essays.md`
+(sourced where it could be, judgment where it says so). The short version:
+
+- An image has a **size class**: `inset` (about half the column, centred), `normal`
+  (the column, the default), `large` (wider than the column; Substack renders it on
+  the web only) or `full` (edge to edge; opt-in, for an image that *is* the content).
+  The vocabulary mirrors what Substack, Medium and the Guardian’s renderer already have.
+- The **hero** (the first image, under the title) is landscape at column width, or an
+  inset. A square or portrait image at column width is drawn taller than a laptop
+  screen, which is the complaint this module exists to answer.
+- A body image that is square or portrait is an inset; a landscape one, a diagram or a
+  chart is `normal`. Few images: after the hero, at most one per 500-1000 words.
+- Captions are one line, not italic (the platforms draw them small, centred, upright).
+
+The class lives in the essay’s front matter, out of the Markdown that goes to the
+publisher:
+
+```default
+images:
+  img/hero.png: inset
+```
+
+A GitHub comment honours it as `<img width>`; python-substack honours it through its
+own `<!-- python-substack-image:v1 ... -->` marker, which [`substack_markdown()`](_autosummary/penult.figures.html.md#penult.figures.substack_markdown)
+writes after each sized image. Neither `{width=...}` nor `<img>` may go to
+python-substack (the first turns the image into its alt text, the second drops it).
+
+```pycon
+>>> sizes_from_fields({"images": {"img/a.png": "inset"}})
+{'img/a.png': 'inset'}
+>>> suggest_size(1024, 1024, hero=True)
+('inset', 'square hero: at column width it is taller than a laptop screen')
+>>> suggest_size(1456, 819, hero=True)
+('normal', 'landscape hero (16:9) fits the column')
+```
+
+### Module Attributes
+
+| [`SIZES`](_autosummary/penult.figures.html.md#penult.figures.SIZES)          | The size classes, narrowest first.                                                                                                     |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| [`COLUMN_WIDTH`](_autosummary/penult.figures.html.md#penult.figures.COLUMN_WIDTH)   | Substack's post column, in CSS pixels (measured; the research report, section 2).                                                      |
+| [`INSET_WIDTH`](_autosummary/penult.figures.html.md#penult.figures.INSET_WIDTH)    | a little over half the column, inside the Guardian's "supporting" range and Wikipedia's 400 px ceiling.                                |
+| [`GITHUB_ATTRS`](_autosummary/penult.figures.html.md#penult.figures.GITHUB_ATTRS)   | `<img>` attributes per class for a GitHub comment (the comment is already about the column's width, so only `inset` narrows anything). |
+| [`SUBSTACK_ATTRS`](_autosummary/penult.figures.html.md#penult.figures.SUBSTACK_ATTRS) | `image2` attributes per class for python-substack.                                                                                     |
+
+### Functions
+
+| [`describe_images`](_autosummary/penult.figures.html.md#penult.figures.describe_images)(folder, markdown)                 | One record per image: path, pixels, the class set, the class suggested, the reason.   |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [`github_attrs`](_autosummary/penult.figures.html.md#penult.figures.github_attrs)(size, \*[, inset_width])             | The `<img>` attributes a size class adds in a GitHub comment.                         |
+| [`pixel_size`](_autosummary/penult.figures.html.md#penult.figures.pixel_size)(path)                                  | `(width, height)` of a PNG, GIF or JPEG from its header, else `None`.                 |
+| [`sizes_from_fields`](_autosummary/penult.figures.html.md#penult.figures.sizes_from_fields)(fields)                         | The `images:` front-matter map, validated: relative path -> size class.               |
+| [`substack_markdown`](_autosummary/penult.figures.html.md#penult.figures.substack_markdown)(markdown[, sizes, inset_width]) | The essay with a python-substack image marker after each image whose class says so.   |
+| [`suggest_size`](_autosummary/penult.figures.html.md#penult.figures.suggest_size)(width, height, \*, hero)             | The size class the rules give an image of these pixels, with the reason.              |
+| [`with_sizes`](_autosummary/penult.figures.html.md#penult.figures.with_sizes)(markdown, sizes)                       | The essay text with its `images:` front-matter map replaced by `sizes`.               |
+
+### penult.figures.COLUMN_WIDTH *= 728*
+
+Substack’s post column, in CSS pixels (measured; the research report, section 2).
+
+### penult.figures.GITHUB_ATTRS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]* *= {'full': {}, 'inset': {'width': 400}, 'large': {}, 'normal': {}}*
+
+`<img>` attributes per class for a GitHub comment (the comment is already about
+the column’s width, so only `inset` narrows anything).
+
+### penult.figures.INSET_WIDTH *= 400*
+
+a little over half the
+column, inside the Guardian’s “supporting” range and Wikipedia’s 400 px ceiling.
+
+* **Type:**
+  An inset’s rendered width, in CSS pixels, on both renderers
+
+### penult.figures.SIZES *= ('inset', 'normal', 'large', 'full')*
+
+The size classes, narrowest first.
+
+### penult.figures.SUBSTACK_ATTRS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]* *= {'full': {'fullscreen': True}, 'inset': {'resizeWidth': 400}, 'large': {'imageSize': 'large'}, 'normal': {}}*
+
+`image2` attributes per class for python-substack. `resizeWidth` is what the
+editor’s own resize handle writes. `large` and `full` are the values the
+stylesheet’s `sizing-large` / `sizing-fullscreen` classes imply; a draft sized
+in the editor and read back would confirm them (the report’s open item).
+
+### penult.figures.describe_images(folder, markdown)
+
+One record per image: path, pixels, the class set, the class suggested, the reason.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/typing.html#typing.Iterator)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+### penult.figures.github_attrs(size, , inset_width=400)
+
+The `<img>` attributes a size class adds in a GitHub comment.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### penult.figures.pixel_size(path)
+
+`(width, height)` of a PNG, GIF or JPEG from its header, else `None`.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### penult.figures.sizes_from_fields(fields)
+
+The `images:` front-matter map, validated: relative path -> size class.
+
+```pycon
+>>> sizes_from_fields({})
+{}
+>>> sizes_from_fields({"images": {"img/a.png": "huge"}})
+Traceback (most recent call last):
+...
+penult.base.PenultError: images: img/a.png: unknown size 'huge'; one of inset, normal, large, full
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### penult.figures.substack_markdown(markdown, sizes=None, , inset_width=400)
+
+The essay with a python-substack image marker after each image whose class says so.
+
+The marker is an HTML comment python-substack merges into the `image2` node;
+GitHub and every Markdown viewer hide it. Front matter and the image lines are
+unchanged, so `article`’s checks apply as before.
+
+```pycon
+>>> out = substack_markdown('---\ntitle: T\nimages:\n  img/a.png: inset\n---\n# T\n\n![a](img/a.png "c")\n')
+>>> out.splitlines()[-1].startswith("<!-- python-substack-image:v1 ")
+True
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### penult.figures.suggest_size(width, height, , hero)
+
+The size class the rules give an image of these pixels, with the reason.
+
+```pycon
+>>> suggest_size(709, 195, hero=False)
+('normal', 'landscape (3.6:1) at column width')
+>>> suggest_size(700, 556, hero=False)
+('inset', 'squarish (1.3:1): an inset keeps the text in view')
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### penult.figures.with_sizes(markdown, sizes)
+
+The essay text with its `images:` front-matter map replaced by `sizes`.
+
+Only the `images` key changes; the other front-matter lines are kept as written.
+
+```pycon
+>>> print(with_sizes('---\ntitle: T\n---\nbody\n', {"img/a.png": "inset"}))
+---
+title: T
+images:
+  img/a.png: inset
+---
+body
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/penult.github.html.md
@@ -254,13 +435,14 @@ in the `penult` skill; the verbs here keep every step from being improvised twic
 | [`image_add`](_autosummary/penult.html.md#penult.image_add)(source, \*, name, credit[, folder, ...]) | Add an image (a URL or a local file) to img/ with its credit; `--prompt` if a person generated it.  |
 | [`image_generate`](_autosummary/penult.html.md#penult.image_generate)(prompt, \*, name[, folder, ...])    | Generate one image from `prompt` into img/, within the `max_generated_images` budget.               |
 | [`image_search`](_autosummary/penult.html.md#penult.image_search)(query, \*[, folder, n, searcher])     | Find existing stock, Creative-Commons or public-domain images for `query`, credited.                |
+| [`layout`](_autosummary/penult.html.md#penult.layout)([folder, apply])                            | Each image's size class against the layout rules; `--apply` writes the suggestions.                 |
 | [`mark`](_autosummary/penult.html.md#penult.mark)([folder])                                     | Record that the workspace reached `stage` (researched, drafted, styled, illustrated).               |
 | [`post`](_autosummary/penult.html.md#penult.post)([folder, new, runner])                        | Post comment.md on the issue (or update the comment posted last time; `--new` posts another).       |
 | [`preferences`](_autosummary/penult.html.md#penult.preferences)(\*[, data_dir, files])                 | The preferences: the defaults, overlaid with what the person wrote.                                 |
 | [`prefs`](_autosummary/penult.html.md#penult.prefs)(\*[, data_dir, files])                       | The private preferences (defaults overlaid with what the person set).                               |
 | [`prefs_set`](_autosummary/penult.html.md#penult.prefs_set)(key, value, \*[, data_dir, files])       | Set one preference; the value must have the default's type (`2`, `'["me","dfw"]'`, text).           |
 | [`publish`](_autosummary/penult.html.md#penult.publish)([folder, platform, dry_run, ...])          | Hand the approved essay to the publisher for an **unpublished** draft on the platform.              |
-| [`render`](_autosummary/penult.html.md#penult.render)([folder, raw_base, runner])                 | Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.              |
+| [`render`](_autosummary/penult.html.md#penult.render)([folder, raw_base, data_dir, files, ...])   | Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.              |
 | [`start`](_autosummary/penult.html.md#penult.start)(seed, \*[, into, force, data_dir, ...])      | Fetch the seed (a GitHub issue URL) and make the workspace: seed, brief, state.                     |
 | [`status`](_autosummary/penult.html.md#penult.status)([folder])                                   | Where the workspace stands: stage, files present, images, the posted comment, what comes next.      |
 
@@ -404,6 +586,21 @@ Candidates are recorded in images.md. Download the one you use with
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
+### penult.layout(folder=None, , apply=False)
+
+Each image’s size class against the layout rules; `--apply` writes the suggestions.
+
+The rules (`penult.figures`, from the layout research in `misc/docs/research/`):
+the hero is landscape at column width or an inset; a square or portrait body image
+is an inset; a landscape one, a diagram or a chart takes the column; after the hero,
+about one image per 500 words at most. The class goes in essay.md’s `images:`
+front matter, which `render` honours as `<img width>` and `publish` as
+python-substack’s image marker. `--apply` sets every unset image’s class to the
+suggestion (a class set by hand is kept; to change one, edit the front matter).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### penult.mark(folder=None, , stage)
 
 Record that the workspace reached `stage` (researched, drafted, styled, illustrated).
@@ -455,7 +652,7 @@ the approval, unless `--dry-run` (which converts and checks, sending nothing).
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### penult.render(folder=None, \*, raw_base=None, runner=<function run>)
+### penult.render(folder=None, \*, raw_base=None, data_dir=None, files=None, runner=<function run>)
 
 Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.
 
@@ -490,6 +687,7 @@ Where the workspace stands: stage, files present, images, the posted comment, wh
 
 | [`base`](_autosummary/penult.base.html.md#module-penult.base)           | Errors, constants and the stage names shared across penult.                                        |
 |------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| [`figures`](_autosummary/penult.figures.html.md#module-penult.figures)     | Illustration layout: how big each image is drawn, and where, on every renderer.                    |
 | [`github`](_autosummary/penult.github.html.md#module-penult.github)       | GitHub, through the `gh` and `git` commands: read an issue, post or edit a comment, find raw URLs. |
 | [`images`](_autosummary/penult.images.html.md#module-penult.images)       | Images for the essay: find existing ones, generate a few, and keep the ledger.                     |
 | [`store`](_autosummary/penult.store.html.md#module-penult.store)         | Where penult's private data lives, and the preferences read from it.                               |
@@ -623,7 +821,7 @@ touching the rest:
 | [`text_files`](_autosummary/penult.store.html.md#penult.store.text_files)(root)                                  | A `dol` files store under `root`: `/`-separated keys, UTF-8 text values.              |
 | [`write_preferences`](_autosummary/penult.store.html.md#penult.store.write_preferences)(values, \*[, data_dir, files])  | Replace the saved preferences (only the keys that differ from the defaults are kept). |
 
-### penult.store.DEFAULT_PREFERENCES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]* *= {'article_env_file': '~/.config/article/.env', 'article_state_path': '~/.local/share/article/pipeline_state.json', 'audience': 'non-technical readers, or software engineers, managers and scientists', 'max_generated_images': 2, 'min_image_prompts': 5, 'platform': 'substack', 'research_depth': 'deep', 'voice_models': ['me'], 'voice_register': 'essay', 'workspace': 'docs/{slug}'}*
+### penult.store.DEFAULT_PREFERENCES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]* *= {'article_env_file': '~/.config/article/.env', 'article_state_path': '~/.local/share/article/pipeline_state.json', 'audience': 'non-technical readers, or software engineers, managers and scientists', 'inset_width': 400, 'max_generated_images': 2, 'min_image_prompts': 5, 'platform': 'substack', 'research_depth': 'deep', 'voice_models': ['me'], 'voice_register': 'essay', 'workspace': 'docs/{slug}'}*
 
 The preferences every verb falls back to. A person changes them with
 `penult prefs-set`; an agent changes them only when the person said so.
@@ -719,7 +917,7 @@ the injected callables are for Python callers and tests.
 * **Type:**
   Parameters a surface built from these signatures leaves out
 
-### penult.tools.TOOLS *= [<function start>, <function status>, <function mark>, <function check>, <function image_search>, <function image_generate>, <function image_add>, <function render>, <function post>, <function approve>, <function publish>, <function prefs>, <function prefs_set>]*
+### penult.tools.TOOLS *= [<function start>, <function status>, <function mark>, <function check>, <function image_search>, <function image_generate>, <function image_add>, <function layout>, <function render>, <function post>, <function approve>, <function publish>, <function prefs>, <function prefs_set>]*
 
 The one list every surface is built from. Never write a second one.
 
@@ -885,7 +1083,7 @@ How many whitespace-separated words a text has.
 
 # About this build
 
-This documentation was built on **2026-11-06 11:12 UTC** from commit <a href="https://github.com/thorwhalen/penult/commit/69ca2ceb2589faa4b5cecbf4ea9447937ce4165a"><code>69ca2ce</code></a> on branch <code>main</code>, for **penult 0.0.1** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-06 13:15 UTC** from commit <a href="https://github.com/thorwhalen/penult/commit/ab5a4da447d5c8a6785e5d06e1c0105614f2243c"><code>ab5a4da</code></a> on branch <code>main</code>, for **penult 0.0.2** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -894,7 +1092,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/penult/commit/69ca2ceb2589faa4b5cecbf4ea9447937ce4165a"><code>69ca2ceb2589faa4b5cecbf4ea9447937ce4165a</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/penult/commit/ab5a4da447d5c8a6785e5d06e1c0105614f2243c"><code>ab5a4da447d5c8a6785e5d06e1c0105614f2243c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -905,9 +1103,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/penult</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/penult/actions/runs/42208326967">42208326967</a>    |
+| Run          | <a href="https://github.com/thorwhalen/penult/actions/runs/42223881027">42223881027</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>69ca2ceb2589faa4b5cecbf4ea9447937ce4165a</code> (in the history of the built commit) |
+| Event commit | <code>ab5a4da447d5c8a6785e5d06e1c0105614f2243c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -932,13 +1130,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-<code>penult</code> is not on PyPI.
+Latest release: <a href="https://pypi.org/project/penult/0.0.2/">0.0.2</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/penult && cd penult
-git checkout 69ca2ceb2589faa4b5cecbf4ea9447937ce4165a
+git checkout ab5a4da447d5c8a6785e5d06e1c0105614f2243c
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
