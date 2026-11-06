@@ -120,4 +120,5 @@ def test_publish_hands_article_a_sized_private_copy_only_when_something_is_sized
     text = copy.read_text()
     assert "python-substack-image:v1" in text
     assert str((ws / "img" / "hero.png").resolve()) in text  # images resolve without the copy's folder
-    assert "images:\n  img/hero.png: inset" in text  # front matter untouched
+    assert "images:" not in text  # article refuses front-matter keys it does not know
+    assert text.startswith("---\ntitle: T\nsubtitle: S\n---\n")

@@ -758,20 +758,24 @@ def article_publisher(
 
 
 def _platform_source(ws: Workspace, platform: str, prefs: dict, data_dir_arg) -> Path:
-    """essay.md itself, or, for Substack with sized images, a copy under the data root
-    with python-substack's image markers and absolute image paths (the copy is private
-    and derived; essay.md stays the one source)."""
+    """essay.md itself, or a private copy under the data root that ``article`` accepts.
+
+    The copy drops the ``images:`` front matter (article refuses keys it does not know)
+    and, for Substack, carries python-substack's image marker after each sized image and
+    absolute image paths. essay.md stays the one source; the copy is derived each time.
+    """
     markdown = _essay_text(ws)
-    if platform != "substack":
+    sizes = _layout.sizes_from_fields(essay_fields(markdown))
+    if not sizes and "images" not in essay_fields(markdown):
         return ws.essay
-    sized = _layout.substack_markdown(markdown, inset_width=prefs["inset_width"])
-    if sized == markdown:
-        return ws.essay
+    copy = _layout.with_sizes(markdown, {})
+    if platform == "substack":
+        copy = _layout.substack_markdown(copy, sizes, inset_width=prefs["inset_width"])
     for src in local_images(markdown):
-        sized = sized.replace(f"]({src}", f"]({(ws.folder / src).resolve()}")
-    target = data_dir_path(data_dir_arg) / "work" / ws.folder.name / "substack.md"
+        copy = copy.replace(f"]({src}", f"]({(ws.folder / src).resolve()}")
+    target = data_dir_path(data_dir_arg) / "work" / ws.folder.name / f"{platform}.md"
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(sized, encoding="utf-8")
+    target.write_text(copy, encoding="utf-8")
     return target
 
 
