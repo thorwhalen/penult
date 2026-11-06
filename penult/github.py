@@ -149,7 +149,8 @@ def unpushed(checkout: dict[str, Any], paths: list[Path], *, runner: Runner = su
     image it references is in this list.
     """
     root = checkout["root"]
-    names = [str(Path(p).resolve().relative_to(Path(root).resolve())) for p in paths]
+    # git prints paths with forward slashes on every platform, so compare in that form
+    names = [Path(p).resolve().relative_to(Path(root).resolve()).as_posix() for p in paths]
     if not names:
         return []
     dirty = _run(runner, ["git", "-C", root, "status", "--porcelain", "--", *names], what="check the tree")
