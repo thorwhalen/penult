@@ -35,6 +35,7 @@ from typing import Any, Callable
 
 from penult import github as _gh
 from penult import images as _images
+from penult import figures as _layout
 from penult.base import STAGES, PenultError
 from penult.render import essay_fields, local_images, render_comment, text_hash
 from penult.store import DEFAULT_PREFERENCES, data_dir, preferences, set_preference
@@ -479,6 +480,62 @@ def image_add(
     }
 
 
+# -- layout ----------------------------------------------------------------------------
+
+
+def layout(
+    folder: str | None = None,
+    *,
+    apply: bool = False,
+) -> dict:
+    """Each image's size class against the layout rules; ``--apply`` writes the suggestions.
+
+    The rules (``penult.figures``, from the layout research in ``misc/docs/research/``):
+    the hero is landscape at column width or an inset; a square or portrait body image
+    is an inset; a landscape one, a diagram or a chart takes the column; after the hero,
+    about one image per 500 words at most. The class goes in essay.md's ``images:``
+    front matter, which ``render`` honours as ``<img width>`` and ``publish`` as
+    python-substack's image marker. ``--apply`` sets every unset image's class to the
+    suggestion (a class set by hand is kept; to change one, edit the front matter).
+    """
+    ws = _ws(folder)
+    markdown = _essay_text(ws)
+    records = list(_layout.describe_images(ws.folder, markdown))
+    images = [r for r in records if "image" in r]
+    notes = [r["note"] for r in records if "note" in r]
+    lines = [
+        f"{'hero ' if r['hero'] else '     '}{r['image']}: "
+        + (f"{r['pixels'][0]}x{r['pixels'][1]}" if r["pixels"] else "?")
+        + f", {r['size'] or 'unset'} -> {r['suggested']} ({r['reason']})"
+        for r in images
+    ] + [f"note: {n}" for n in notes]
+    differ = [
+        r["image"]
+        for r in images
+        if (r["size"] or _layout.DEFAULT_SIZE) != r["suggested"]
+    ]
+    changed: list[str] = []
+    if apply:
+        sizes = {r["image"]: r["size"] or r["suggested"] for r in images}
+        changed = [
+            r["image"]
+            for r in images
+            if not r["size"] and r["suggested"] != _layout.DEFAULT_SIZE
+        ]
+        ws.essay.write_text(_layout.with_sizes(markdown, sizes), encoding="utf-8")
+        lines.append(f"written: images: for {len(changed)} image(s); render and post again")
+    return {
+        "ok": True,
+        "summary": f"{len(images)} image(s), {len(differ)} differ from the rules"
+        + (f"; {len(changed)} set" if apply else ""),
+        "images": images,
+        "notes": notes,
+        "differ": differ,
+        "changed": changed,
+        "text": "\n".join(lines),
+    }
+
+
 # -- render, post, approve, publish ------------------------------------------------------
 
 
@@ -486,6 +543,8 @@ def render(
     folder: str | None = None,
     *,
     raw_base: str | None = None,
+    data_dir: str | None = None,
+    files: MutableMapping | None = None,
     runner: Callable = subprocess.run,
 ) -> dict:
     """Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.
@@ -527,7 +586,10 @@ def render(
         + "Comment with what to change; say when it is good to go and it becomes an unpublished "
         f"{state.get('platform', 'substack')} draft for you to check.*"
     )
-    text = render_comment(markdown, raw_base=raw_base, footer=footer)
+    prefs = _prefs(data_dir, files)
+    text = render_comment(
+        markdown, raw_base=raw_base, footer=footer, inset_width=prefs["inset_width"]
+    )
     ws.comment.write_text(text + "\n", encoding="utf-8")
     missing = [p for p in local_images(markdown) if not (ws.folder / p).is_file()]
     ws.update_state(rendered_hash=text_hash(markdown), rendered_missing=missing)
@@ -695,6 +757,24 @@ def article_publisher(
     }
 
 
+def _platform_source(ws: Workspace, platform: str, prefs: dict, data_dir_arg) -> Path:
+    """essay.md itself, or, for Substack with sized images, a copy under the data root
+    with python-substack's image markers and absolute image paths (the copy is private
+    and derived; essay.md stays the one source)."""
+    markdown = _essay_text(ws)
+    if platform != "substack":
+        return ws.essay
+    sized = _layout.substack_markdown(markdown, inset_width=prefs["inset_width"])
+    if sized == markdown:
+        return ws.essay
+    for src in local_images(markdown):
+        sized = sized.replace(f"]({src}", f"]({(ws.folder / src).resolve()}")
+    target = data_dir_path(data_dir_arg) / "work" / ws.folder.name / "substack.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(sized, encoding="utf-8")
+    return target
+
+
 def publish(
     folder: str | None = None,
     *,
@@ -730,7 +810,7 @@ def publish(
     drafts = dict(state.get("draft_urls") or {})
     result = (publisher or article_publisher)(
         platform,
-        ws.essay,
+        _platform_source(ws, platform, prefs, data_dir),
         prefs=prefs,
         dry_run=dry_run,
         update=bool(drafts.get(platform)),
@@ -786,6 +866,6 @@ def prefs_set(
 TOOLS = [
     start, status, mark, check,
     image_search, image_generate, image_add,
-    render, post, approve, publish,
+    layout, render, post, approve, publish,
     prefs, prefs_set,
 ]  # fmt: skip

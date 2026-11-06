@@ -59,6 +59,9 @@ DEFAULT_PREFERENCES: dict[str, Any] = {
     # to try by hand.
     "max_generated_images": 2,
     "min_image_prompts": 5,
+    # How wide an ``inset`` image is drawn (CSS pixels) in the comment and on Substack;
+    # the size classes themselves are in ``penult.figures``.
+    "inset_width": 400,
     # The ``article`` package's credentials and state, outside every repository.
     "article_env_file": "~/.config/article/.env",
     "article_state_path": "~/.local/share/article/pipeline_state.json",

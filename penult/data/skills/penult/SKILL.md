@@ -51,7 +51,17 @@ For each place an image belongs (the hero, one per major turn of the argument, a
 - **Prompts**: write at least `min_image_prompts` (default 5) prompts into `images.md`, each saying the beat, the style, the composition. Generate **at most `max_generated_images` (default 2)** of them with `penult image-generate "<prompt>" --name <file>`: the top one or two, chosen for where an image matters most. The budget is deliberate: generated images are paid and often off; the author tries the other prompts by hand and gives you the files (`penult image-add <file> --name ... --credit "Image generated for this essay" --prompt "<the prompt>"`).
 - Figures and tables from the research are redrawn (matplotlib, a clean table image) and credited to their source.
 
-Place each image in `essay.md` as its own paragraph: `![alt](img/file.png "Caption with the credit")`. `penult mark --stage illustrated`.
+Place each image in `essay.md` as its own paragraph: `![alt](img/file.png "Caption with the credit")`, directly after the paragraph that first refers to it (the hero goes under the title, before the first paragraph).
+
+**Layout** (the rules and their sources: `misc/docs/research/2026-11-06-illustration-layout-for-essays.md` in the penult repository). An image at column width that is square or portrait is drawn taller than a laptop screen, which readers resent; so each image has a size class, kept in `essay.md`'s front matter and honoured by the comment (`<img width>`) and by Substack (python-substack's image marker, added at publish time):
+
+- `inset` (about half the column, centred): square and portrait images, atmosphere photographs, a hero that is not landscape;
+- `normal` (the column; the default): landscape images, diagrams, charts, a landscape hero;
+- `large` and `full`: opt-in only, for an image that is itself the content (a map, a panorama); Substack shows `large` on the web only.
+
+Run `penult layout <workspace>` to see each image's pixels and the class the rules suggest, and `penult layout <workspace> --apply` to write the suggestions into the front matter (a class set by hand is kept). Prefer generating the hero at 16:9 in the first place; a square hero is an inset or gets cropped. Few images: after the hero, at most one per 500-1000 words, each with its own purpose; `layout` notes when there are more. Captions: one line, saying what the image means for the argument, the credit short at the end when a licence or disclosure needs it; no italics in the source (the platforms draw captions small and upright). Alt text always.
+
+`penult mark --stage illustrated`.
 
 ### 6. Post the draft
 
@@ -62,7 +72,7 @@ penult render <workspace>     # writes comment.md: heading, subtitle, absolute i
 penult post <workspace>       # posts it; a second run updates the same comment (--new for another)
 ```
 
-Give the author the comment link. Iterate on their comments: edit `essay.md`, re-run the voice checks that matter, `render`, `post`. Record anything they say about voice or images that should hold for later essays with `penlike guide-add "<one line>" --source <issue url>` or `penult prefs-set`.
+Give the author the comment link. Iterate on their comments: edit `essay.md`, re-run the voice checks that matter (and `layout` if images changed), `render`, `post`. Record anything they say about voice or images that should hold for later essays with `penlike guide-add "<one line>" --source <issue url>` or `penult prefs-set`.
 
 ### 7. Approval, then the platform draft
 
