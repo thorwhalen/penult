@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "penult"
-version = "0.0.1"
+version = "0.0.2"
 description = "From an idea to a publication draft: research, write, style, illustrate, and post the draft for review"
 readme = "README.md"
 requires-python = ">=3.10"

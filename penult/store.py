@@ -81,7 +81,9 @@ def data_dir(data_dir: str | os.PathLike | None = None) -> Path:
     if configured:
         path = Path(os.path.expanduser(configured))
         if not path.is_absolute():
-            raise PenultError(f"${DATA_DIR_ENVVAR} must be an absolute path, got {configured!r}")
+            raise PenultError(
+                f"${DATA_DIR_ENVVAR} must be an absolute path, got {configured!r}"
+            )
         return path
     if os.name == "nt":  # pragma: no cover - exercised on Windows CI only
         base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
@@ -107,7 +109,9 @@ def text_files(root: str | os.PathLike) -> MutableMapping[str, str]:
     )
 
 
-def _files(files: MutableMapping[str, str] | None, root: Any) -> MutableMapping[str, str]:
+def _files(
+    files: MutableMapping[str, str] | None, root: Any
+) -> MutableMapping[str, str]:
     return text_files(data_dir(root)) if files is None else files
 
 
@@ -129,7 +133,9 @@ def write_preferences(
     files: MutableMapping[str, str] | None = None,
 ) -> None:
     """Replace the saved preferences (only the keys that differ from the defaults are kept)."""
-    saved = {k: v for k, v in values.items() if DEFAULT_PREFERENCES.get(k, object()) != v}
+    saved = {
+        k: v for k, v in values.items() if DEFAULT_PREFERENCES.get(k, object()) != v
+    }
     _files(files, data_dir)[_PREFERENCES_KEY] = json.dumps(saved, indent=2) + "\n"
 
 
@@ -154,8 +160,10 @@ def set_preference(
             value = json.loads(value)
         except ValueError:
             pass
-    if isinstance(expected, bool) and not isinstance(value, bool) or (
-        not isinstance(expected, bool) and not isinstance(value, type(expected))
+    if (
+        isinstance(expected, bool)
+        and not isinstance(value, bool)
+        or (not isinstance(expected, bool) and not isinstance(value, type(expected)))
     ):
         raise PenultError(
             f"{key} takes a {type(expected).__name__} (as JSON, e.g. {json.dumps(expected)}), got {value!r}"

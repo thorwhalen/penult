@@ -26,7 +26,14 @@ from typing import Any, Callable
 from penult.base import PenultError
 from penult.workspace import Workspace, now
 
-__all__ = ["add_image", "credit_line", "default_generator", "default_searcher", "generate_image", "search_images"]
+__all__ = [
+    "add_image",
+    "credit_line",
+    "default_generator",
+    "default_searcher",
+    "generate_image",
+    "search_images",
+]
 
 _LEDGER_HEADER = (
     "# Images\n\n"
@@ -50,7 +57,14 @@ def hit_record(hit: Any) -> dict[str, Any]:
     """One search hit as a plain dict, whatever object the searcher returned."""
     return {
         "url": _hit_field(hit, "url", "image_url"),
-        "page": _hit_field(hit, "source_page_url", "page_url", "foreign_landing_url", "source_url", "landing_url"),
+        "page": _hit_field(
+            hit,
+            "source_page_url",
+            "page_url",
+            "foreign_landing_url",
+            "source_url",
+            "landing_url",
+        ),
         "title": _hit_field(hit, "title", "alt", "description") or "",
         "author": _hit_field(hit, "author", "creator", "photographer") or "",
         "license": _hit_field(hit, "license", "license_type") or "",
@@ -66,7 +80,14 @@ def credit_line(record: dict[str, Any]) -> str:
         return str(record["attribution"])
     title = record.get("title") or "Untitled"
     by = f", by {record['author']}" if record.get("author") else ""
-    tail = ", ".join(x for x in (record.get("license"), f"via {record['source']}" if record.get("source") else "") if x)
+    tail = ", ".join(
+        x
+        for x in (
+            record.get("license"),
+            f"via {record['source']}" if record.get("source") else "",
+        )
+        if x
+    )
     return f"{title}{by}" + (f" ({tail})" if tail else "")
 
 
@@ -75,7 +96,9 @@ def default_searcher(query: str, *, n: int = 8, **options: Any) -> list[Any]:
     try:
         import illustration
     except ImportError as error:  # pragma: no cover - depends on the environment
-        raise PenultError("image search needs the illustration package: pip install 'penult[images]'") from error
+        raise PenultError(
+            "image search needs the illustration package: pip install 'penult[images]'"
+        ) from error
     return list(illustration.search(query, n=n, **options))
 
 
@@ -84,7 +107,9 @@ def default_generator(prompt: str, *, path: Path, **options: Any) -> Path:
     try:
         from aix.image import generate_image
     except ImportError as error:  # pragma: no cover - depends on the environment
-        raise PenultError("image generation needs aix with litellm: pip install 'penult[images]'") from error
+        raise PenultError(
+            "image generation needs aix with litellm: pip install 'penult[images]'"
+        ) from error
     image = generate_image(prompt, **options)
     image.save(path)
     return path
@@ -116,7 +141,9 @@ def _rejected(error: Exception) -> bool:
     >>> _rejected(E()), _rejected(ValueError("Error code: 404 - no such model")), _rejected(RuntimeError("timeout"))
     (True, True, False)
     """
-    code = getattr(error, "status_code", None) or getattr(getattr(error, "response", None), "status_code", None)
+    code = getattr(error, "status_code", None) or getattr(
+        getattr(error, "response", None), "status_code", None
+    )
     if isinstance(code, int):
         return 400 <= code < 500
     found = re.search(r"error code:?\s*(\d{3})\b", str(error), re.IGNORECASE)
@@ -131,7 +158,12 @@ def _safe_name(name: str) -> str:
 
 
 def search_images(
-    ws: Workspace, query: str, *, n: int = 8, searcher: Callable[..., list[Any]] | None = None, **options: Any
+    ws: Workspace,
+    query: str,
+    *,
+    n: int = 8,
+    searcher: Callable[..., list[Any]] | None = None,
+    **options: Any,
 ) -> list[dict[str, Any]]:
     """Find existing images for ``query`` and record the candidates in the ledger."""
     searcher = searcher or default_searcher
@@ -145,7 +177,14 @@ def search_images(
 
 
 def add_image(
-    ws: Workspace, source: str, *, name: str, credit: str, license: str = "", prompt: str | None = None, used: bool = True
+    ws: Workspace,
+    source: str,
+    *,
+    name: str,
+    credit: str,
+    license: str = "",
+    prompt: str | None = None,
+    used: bool = True,
 ) -> Path:
     """Put an image in ``img/`` (from a URL or a local path) and record its credit."""
     name = _safe_name(name)
@@ -154,7 +193,12 @@ def add_image(
     target = ws.img / (name if Path(name).suffix else name + suffix)
     if re.match(r"https?://", source):
         # Wikimedia and others refuse urllib's default agent; name ourselves.
-        request = urllib.request.Request(source, headers={"User-Agent": "penult/0.1 (+https://github.com/thorwhalen/penult)"})
+        request = urllib.request.Request(
+            source,
+            headers={
+                "User-Agent": "penult/0.1 (+https://github.com/thorwhalen/penult)"
+            },
+        )
         try:
             with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 - the user's own URL
                 data = response.read()
@@ -162,8 +206,16 @@ def add_image(
         except OSError as error:
             raise PenultError(f"could not download {source}: {error}") from error
         if not Path(source.split("?")[0]).suffix and not Path(name).suffix:
-            guessed = {"image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "image/webp": ".webp", "image/svg+xml": ".svg"}
-            target = target.with_suffix(guessed.get(content_type.split(";")[0].strip(), ".png"))
+            guessed = {
+                "image/jpeg": ".jpg",
+                "image/png": ".png",
+                "image/gif": ".gif",
+                "image/webp": ".webp",
+                "image/svg+xml": ".svg",
+            }
+            target = target.with_suffix(
+                guessed.get(content_type.split(";")[0].strip(), ".png")
+            )
         target.write_bytes(data)
     else:
         origin = Path(source).expanduser()
@@ -197,9 +249,15 @@ def generate_image(
     """
     name = _safe_name(name)
     state = ws.read_state()
-    generated = [r for r in state.get("images", []) if r.get("kind") in ("generated", "generated-failed")]
+    generated = [
+        r
+        for r in state.get("images", [])
+        if r.get("kind") in ("generated", "generated-failed")
+    ]
     if len(generated) >= max_generated and not force:
-        _append_ledger(ws, {"when": now(), "kind": "prompt", "prompt": prompt, "used": False})
+        _append_ledger(
+            ws, {"when": now(), "kind": "prompt", "prompt": prompt, "used": False}
+        )
         return {
             "generated": False,
             "prompt": prompt,
@@ -213,7 +271,16 @@ def generate_image(
         # A request the provider rejected (a 4xx: bad parameter, unknown model) was
         # never billed and does not count; anything else may have been, and does.
         kind = "generation-error" if _rejected(error) else "generated-failed"
-        _append_ledger(ws, {"when": now(), "kind": kind, "prompt": prompt, "credit": str(error)[:200], "used": False})
+        _append_ledger(
+            ws,
+            {
+                "when": now(),
+                "kind": kind,
+                "prompt": prompt,
+                "credit": str(error)[:200],
+                "used": False,
+            },
+        )
         raise
     _append_ledger(ws, {
         "when": now(), "kind": "generated", "file": f"img/{Path(path).name}", "prompt": prompt,

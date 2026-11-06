@@ -31,7 +31,9 @@ __all__ = [
 
 Runner = Callable[..., Any]
 
-_ISSUE_URL = re.compile(r"^https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/issues/(\d+)(?:[/#?].*)?$")
+_ISSUE_URL = re.compile(
+    r"^https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/issues/(\d+)(?:[/#?].*)?$"
+)
 _REMOTE = re.compile(r"[:/]([^/:]+)/([^/]+?)(?:\.git)?/?$")
 _TIMEOUT = 600
 
@@ -51,7 +53,9 @@ def _run(runner: Runner, args: list[str], *, what: str, **kwargs: Any) -> str:
     try:
         done = runner(args, capture_output=True, text=True, timeout=_TIMEOUT, **kwargs)
     except FileNotFoundError as error:
-        raise PenultError(f"{args[0]!r} is not installed; it is needed to {what}") from error
+        raise PenultError(
+            f"{args[0]!r} is not installed; it is needed to {what}"
+        ) from error
     if done.returncode != 0:
         detail = (done.stderr or done.stdout or "").strip()
         raise PenultError(f"could not {what}: {detail or 'command failed'}")
@@ -102,9 +106,13 @@ def post_comment(url: str, body_file: Path, *, runner: Runner = subprocess.run) 
     return out.strip().splitlines()[-1] if out.strip() else ""
 
 
-def edit_comment(comment_url: str, body_file: Path, *, runner: Runner = subprocess.run) -> str:
+def edit_comment(
+    comment_url: str, body_file: Path, *, runner: Runner = subprocess.run
+) -> str:
     """Replace an existing comment's body (``comment_url`` ends in ``#issuecomment-<id>``)."""
-    found = re.search(r"github\.com/([^/]+)/([^/]+)/issues/\d+#issuecomment-(\d+)", comment_url)
+    found = re.search(
+        r"github\.com/([^/]+)/([^/]+)/issues/\d+#issuecomment-(\d+)", comment_url
+    )
     if not found:
         raise PenultError(f"not an issue-comment URL: {comment_url!r}")
     owner, repo, comment_id = found.groups()
@@ -118,14 +126,22 @@ def edit_comment(comment_url: str, body_file: Path, *, runner: Runner = subproce
     return comment_url
 
 
-def repo_of_checkout(path: Path, *, runner: Runner = subprocess.run) -> dict[str, Any] | None:
+def repo_of_checkout(
+    path: Path, *, runner: Runner = subprocess.run
+) -> dict[str, Any] | None:
     """The checkout holding ``path``: its root, GitHub owner/repo, branch and commit, or ``None``."""
     try:
         git = ["git", "-C", str(path)]
-        root = _run(runner, [*git, "rev-parse", "--show-toplevel"], what="find the repo").strip()
+        root = _run(
+            runner, [*git, "rev-parse", "--show-toplevel"], what="find the repo"
+        ).strip()
         git = ["git", "-C", root]
-        remote = _run(runner, [*git, "remote", "get-url", "origin"], what="read the remote").strip()
-        branch = _run(runner, [*git, "rev-parse", "--abbrev-ref", "HEAD"], what="read the branch").strip()
+        remote = _run(
+            runner, [*git, "remote", "get-url", "origin"], what="read the remote"
+        ).strip()
+        branch = _run(
+            runner, [*git, "rev-parse", "--abbrev-ref", "HEAD"], what="read the branch"
+        ).strip()
         sha = _run(runner, [*git, "rev-parse", "HEAD"], what="read the commit").strip()
     except PenultError:
         return None
@@ -133,7 +149,13 @@ def repo_of_checkout(path: Path, *, runner: Runner = subprocess.run) -> dict[str
     if not found:
         return None
     owner, repo = found.groups()
-    return {"root": root, "owner": owner, "repo": repo, "branch": branch, "sha": sha or branch}
+    return {
+        "root": root,
+        "owner": owner,
+        "repo": repo,
+        "branch": branch,
+        "sha": sha or branch,
+    }
 
 
 def raw_url_base(checkout: dict[str, Any], folder: Path) -> str:
@@ -145,7 +167,9 @@ def raw_url_base(checkout: dict[str, Any], folder: Path) -> str:
     >>> raw_url_base({"root": "/r", "owner": "o", "repo": "e", "branch": "main", "sha": "abc123"}, Path("/r/docs/an essay"))
     'https://raw.githubusercontent.com/o/e/abc123/docs/an%20essay/'
     """
-    rel = Path(folder).resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
+    rel = (
+        Path(folder).resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
+    )
     rel = quote(rel) + "/" if rel not in ("", ".") else ""
     ref = checkout.get("sha") or checkout["branch"]
     return f"https://raw.githubusercontent.com/{checkout['owner']}/{checkout['repo']}/{ref}/{rel}"
@@ -170,7 +194,9 @@ def _status_paths(porcelain_z: str) -> set[str]:
     return found
 
 
-def unpushed(checkout: dict[str, Any], paths: list[Path], *, runner: Runner = subprocess.run) -> list[str]:
+def unpushed(
+    checkout: dict[str, Any], paths: list[Path], *, runner: Runner = subprocess.run
+) -> list[str]:
     """Which of ``paths`` are not yet committed and pushed to the branch's upstream.
 
     A raw URL only works for a file that is on GitHub, so ``post`` refuses while any
@@ -182,12 +208,25 @@ def unpushed(checkout: dict[str, Any], paths: list[Path], *, runner: Runner = su
     if not names:
         return []
     git = ["git", "-C", str(root)]
-    dirty = _run(runner, [*git, "status", "--porcelain", "-z", "--", *names], what="check the tree")
+    dirty = _run(
+        runner,
+        [*git, "status", "--porcelain", "-z", "--", *names],
+        what="check the tree",
+    )
     missing = _status_paths(dirty)
     try:
         ahead = _run(
             runner,
-            [*git, "log", "--name-only", "-z", "--pretty=format:", "@{upstream}..HEAD", "--", *names],
+            [
+                *git,
+                "log",
+                "--name-only",
+                "-z",
+                "--pretty=format:",
+                "@{upstream}..HEAD",
+                "--",
+                *names,
+            ],
             what="compare with the upstream",
         )
         missing |= {p.strip() for p in re.split(r"[\0\n]", ahead) if p.strip()}

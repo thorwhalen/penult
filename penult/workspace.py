@@ -76,7 +76,9 @@ def slug_of(title: str, *, max_length: int = 60) -> str:
     return "-".join(out) or "essay"
 
 
-def is_thin(issue: dict[str, Any], *, threshold: int = THIN_SEED_WORDS) -> dict[str, Any]:
+def is_thin(
+    issue: dict[str, Any], *, threshold: int = THIN_SEED_WORDS
+) -> dict[str, Any]:
     """Whether the seed is too thin to research and draft from without asking.
 
     A thin seed is one with fewer than ``threshold`` words in title, body and
@@ -94,7 +96,9 @@ def is_thin(issue: dict[str, Any], *, threshold: int = THIN_SEED_WORDS) -> dict[
     thin = words < threshold or not has_thesis
     reasons = []
     if words < threshold:
-        reasons.append(f"{words} words in the seed, under the {threshold} it takes to draft from")
+        reasons.append(
+            f"{words} words in the seed, under the {threshold} it takes to draft from"
+        )
     if not has_thesis:
         reasons.append("no full sentence in the body: no thesis to argue")
     return {"thin": thin, "words": words, "reasons": reasons}
@@ -146,7 +150,9 @@ class Workspace:
     def write_state(self, state: dict[str, Any]) -> None:
         """Replace the state."""
         self.folder.mkdir(parents=True, exist_ok=True)
-        self.state_file.write_text(json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        self.state_file.write_text(
+            json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
 
     def update_state(self, **changes: Any) -> dict[str, Any]:
         """Merge ``changes`` into the state and return it."""
@@ -168,9 +174,21 @@ class Workspace:
     # -- what the files say ----------------------------------------------------------
     def files_present(self) -> dict[str, Any]:
         """Which of the expected files exist, with word counts where that means something."""
-        research = sorted(p.name for p in self.research.glob("*.md")) if self.research.is_dir() else []
-        images = sorted(p.name for p in self.img.iterdir() if p.is_file()) if self.img.is_dir() else []
-        essay_words = word_count(self.essay.read_text(encoding="utf-8")) if self.essay.is_file() else 0
+        research = (
+            sorted(p.name for p in self.research.glob("*.md"))
+            if self.research.is_dir()
+            else []
+        )
+        images = (
+            sorted(p.name for p in self.img.iterdir() if p.is_file())
+            if self.img.is_dir()
+            else []
+        )
+        essay_words = (
+            word_count(self.essay.read_text(encoding="utf-8"))
+            if self.essay.is_file()
+            else 0
+        )
         return {
             "seed": self.seed.is_file(),
             "brief": self.brief.is_file(),
@@ -206,7 +224,9 @@ def seed_markdown(issue: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def brief_markdown(issue: dict[str, Any], prefs: dict[str, Any], thin: dict[str, Any]) -> str:
+def brief_markdown(
+    issue: dict[str, Any], prefs: dict[str, Any], thin: dict[str, Any]
+) -> str:
     """The brief the agent fills before researching: angle, audience, voice, images, platform.
 
     Lines marked ``[DECIDE: ...]`` are the agent's to settle (with the user when the
@@ -214,7 +234,9 @@ def brief_markdown(issue: dict[str, Any], prefs: dict[str, Any], thin: dict[str,
     stay here so a later session can see what was assumed.
     """
     verdict = (
-        "THIN: ask the user first (" + "; ".join(thin["reasons"]) + "), with a recommendation for each question."
+        "THIN: ask the user first ("
+        + "; ".join(thin["reasons"])
+        + "), with a recommendation for each question."
         if thin["thin"]
         else f"rich enough ({thin['words']} words): decide the open lines below from the seed and record the assumptions."
     )

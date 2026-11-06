@@ -38,7 +38,14 @@ from penult import images as _images
 from penult.base import STAGES, PenultError
 from penult.render import essay_fields, local_images, render_comment, text_hash
 from penult.store import DEFAULT_PREFERENCES, data_dir, preferences, set_preference
-from penult.workspace import Workspace, brief_markdown, is_thin, now, seed_markdown, slug_of
+from penult.workspace import (
+    Workspace,
+    brief_markdown,
+    is_thin,
+    now,
+    seed_markdown,
+    slug_of,
+)
 
 __all__ = ["HIDDEN_PARAMETERS", "TOOLS", "without"]
 
@@ -120,9 +127,18 @@ def start(
         folder = Path(checkout["root"]) / prefs["workspace"].format(slug=slug)
     ws = Workspace(folder)
     if ws.exists() and not force:
-        raise PenultError(f"{ws.folder} already holds a workspace; use --force to refetch the seed into it")
-    if not ws.exists() and ws.folder.is_dir() and any(ws.folder.iterdir()) and not force:
-        raise PenultError(f"{ws.folder} exists and is not a penult workspace; choose another --into, or --force")
+        raise PenultError(
+            f"{ws.folder} already holds a workspace; use --force to refetch the seed into it"
+        )
+    if (
+        not ws.exists()
+        and ws.folder.is_dir()
+        and any(ws.folder.iterdir())
+        and not force
+    ):
+        raise PenultError(
+            f"{ws.folder} exists and is not a penult workspace; choose another --into, or --force"
+        )
     thin = is_thin(issue)
     ws.folder.mkdir(parents=True, exist_ok=True)
     ws.seed.write_text(seed_markdown(issue), encoding="utf-8")
@@ -139,17 +155,29 @@ def start(
     )  # fmt: skip
     state.setdefault("images", [])
     ws.write_state(state)
-    verdict = "THIN: ask the user before researching" if thin["thin"] else "rich enough: decide the brief and go on"
+    verdict = (
+        "THIN: ask the user before researching"
+        if thin["thin"]
+        else "rich enough: decide the brief and go on"
+    )
     return {
         "ok": True,
         "summary": f"workspace {ws.folder} ({verdict})",
         "workspace": str(ws.folder),
         "slug": slug,
         "thin": thin,
-        "files": {"seed": str(ws.seed), "brief": str(ws.brief), "state": str(ws.state_file)},
+        "files": {
+            "seed": str(ws.seed),
+            "brief": str(ws.brief),
+            "state": str(ws.state_file),
+        },
         "next": "fill brief.md (ask the user if thin), then research into research/, then write essay.md",
         "text": f"{ws.folder}\nseed: {thin['words']} words; {verdict}\n"
-        + ("\n".join(f"  - {r}" for r in thin["reasons"]) + "\n" if thin["reasons"] else "")
+        + (
+            "\n".join(f"  - {r}" for r in thin["reasons"]) + "\n"
+            if thin["reasons"]
+            else ""
+        )
         + f"next: fill {ws.brief.name}, research into research/, write essay.md",
     }
 
@@ -182,7 +210,14 @@ def status(folder: str | None = None) -> dict:
     for platform, url in (state.get("draft_urls") or {}).items():
         lines.append(f"{platform} draft: {url}")
     lines.append(f"next: {nxt}")
-    return {"ok": True, "summary": f"{stage}", "state": state, "files": present, "next": nxt, "text": "\n".join(lines)}
+    return {
+        "ok": True,
+        "summary": f"{stage}",
+        "state": state,
+        "files": present,
+        "next": nxt,
+        "text": "\n".join(lines),
+    }
 
 
 def mark(folder: str | None = None, *, stage: str) -> dict:
@@ -191,7 +226,9 @@ def mark(folder: str | None = None, *, stage: str) -> dict:
     if stage not in STAGES:
         raise PenultError(f"unknown stage {stage!r}; one of: {', '.join(STAGES)}")
     if stage in ("posted", "approved", "published"):
-        raise PenultError(f"{stage!r} is set by penult post / approve / publish, not by hand")
+        raise PenultError(
+            f"{stage!r} is set by penult post / approve / publish, not by hand"
+        )
     state = ws.advance(stage)
     return {"ok": True, "summary": f"stage {state['stage']}", "stage": state["stage"]}
 
@@ -199,11 +236,19 @@ def mark(folder: str | None = None, *, stage: str) -> dict:
 # -- checks ----------------------------------------------------------------------------
 
 
-def _tool_json(module: str, args: list[str], *, runner: Callable, stdin: str | None = None) -> dict | None:
+def _tool_json(
+    module: str, args: list[str], *, runner: Callable, stdin: str | None = None
+) -> dict | None:
     """Run ``python -m <module> ...`` and parse its JSON; ``None`` when the module is not installed."""
     if importlib.util.find_spec(module) is None:
         return None
-    done = runner([sys.executable, "-m", module, *args], capture_output=True, text=True, input=stdin, timeout=_TIMEOUT)
+    done = runner(
+        [sys.executable, "-m", module, *args],
+        capture_output=True,
+        text=True,
+        input=stdin,
+        timeout=_TIMEOUT,
+    )
     out = (done.stdout or "").strip()
     if not out:
         return {"error": (done.stderr or "").strip()[:500]}
@@ -241,44 +286,105 @@ def check(
     report: dict[str, Any] = {"when": now(), "ductus": None, "penlike": {}}
     lines = [f"# Check of {ws.essay.name}, {now()[:16]}", ""]
 
-    gauge = _tool_json("ductus", ["gauge", "-", "--format", "json"], runner=runner, stdin=body)
+    gauge = _tool_json(
+        "ductus", ["gauge", "-", "--format", "json"], runner=runner, stdin=body
+    )
     if gauge is None:
-        lines += ["ductus: not installed (pip install ductus); the agent reads for machine-sounding passages alone.", ""]
+        lines += [
+            "ductus: not installed (pip install ductus); the agent reads for machine-sounding passages alone.",
+            "",
+        ]
     elif "segments" not in gauge:
         lines += [f"ductus: failed: {gauge.get('error', gauge)}", ""]
     else:
         doc = gauge.get("document", {})
         flagged = sorted(
-            (s for s in gauge["segments"] if (s.get("lean") or 0) > 0 and (s.get("strength") or 0) > 0),
+            (
+                s
+                for s in gauge["segments"]
+                if (s.get("lean") or 0) > 0 and (s.get("strength") or 0) > 0
+            ),
             key=lambda s: -(s.get("lean", 0) * s.get("strength", 0)),
         )
-        report["ductus"] = {"label": doc.get("label"), "lean": doc.get("lean"), "strength": doc.get("strength"), "flagged": len(flagged)}
-        lines += [f"## ductus: {doc.get('label')} (lean {doc.get('lean')}, strength {doc.get('strength')}); {len(flagged)} segment(s) lean machine", ""]
+        report["ductus"] = {
+            "label": doc.get("label"),
+            "lean": doc.get("lean"),
+            "strength": doc.get("strength"),
+            "flagged": len(flagged),
+        }
+        lines += [
+            f"## ductus: {doc.get('label')} (lean {doc.get('lean')}, strength {doc.get('strength')}); {len(flagged)} segment(s) lean machine",
+            "",
+        ]
         for seg in flagged[:25]:
-            quote = (seg.get("text") or (seg.get("span") or {}).get("quote") or "").strip().replace("\n", " ")
-            reasons = "; ".join(sig.get("note", "") for sig in seg.get("signals", [])[:2] if sig.get("direction") == "machine")
-            lines.append(f"- lean {seg.get('lean'):+.2f} / strength {seg.get('strength'):.2f}: \"{quote[:160]}\"" + (f" ({reasons})" if reasons else ""))
+            quote = (
+                (seg.get("text") or (seg.get("span") or {}).get("quote") or "")
+                .strip()
+                .replace("\n", " ")
+            )
+            reasons = "; ".join(
+                sig.get("note", "")
+                for sig in seg.get("signals", [])[:2]
+                if sig.get("direction") == "machine"
+            )
+            lines.append(
+                f'- lean {seg.get("lean"):+.2f} / strength {seg.get("strength"):.2f}: "{quote[:160]}"'
+                + (f" ({reasons})" if reasons else "")
+            )
         lines.append("")
 
     for model in like:
-        result = _tool_json("penlike", ["check", "-", "--like", model, "--style", style, "--json"], runner=runner, stdin=body)
+        result = _tool_json(
+            "penlike",
+            ["check", "-", "--like", model, "--style", style, "--json"],
+            runner=runner,
+            stdin=body,
+        )
         if result is None:
-            lines += ["penlike: not installed (pip install penlike); voice not measured.", ""]
+            lines += [
+                "penlike: not installed (pip install penlike); voice not measured.",
+                "",
+            ]
             break
         if "discrepancies" not in result:
-            lines += [f"## penlike against `{model}`: failed: {result.get('error', result)}", ""]
+            lines += [
+                f"## penlike against `{model}`: failed: {result.get('error', result)}",
+                "",
+            ]
             continue
         discrepancies = result["discrepancies"]
-        report["penlike"][model] = {"register": result.get("register"), "discrepancies": len(discrepancies)}
-        lines += [f"## penlike against `{model}` ({result.get('register')}): {len(discrepancies)} discrepancies", ""]
-        lines += ["- " + line.lstrip("- ").strip() for line in (result.get("text") or "").splitlines() if line.strip()][:30]
+        report["penlike"][model] = {
+            "register": result.get("register"),
+            "discrepancies": len(discrepancies),
+        }
+        lines += [
+            f"## penlike against `{model}` ({result.get('register')}): {len(discrepancies)} discrepancies",
+            "",
+        ]
+        lines += [
+            "- " + line.lstrip("- ").strip()
+            for line in (result.get("text") or "").splitlines()
+            if line.strip()
+        ][:30]
         lines.append("")
 
-    target = Path(out).expanduser() if out else data_dir_path(data_dir) / "work" / ws.folder.name / "check.md"
+    target = (
+        Path(out).expanduser()
+        if out
+        else data_dir_path(data_dir) / "work" / ws.folder.name / "check.md"
+    )
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
-    ws.update_state(last_check=report)  # the path is local and private; it is returned, not stored
-    return {"ok": True, "summary": f"check written to {target}", "report": report, "path": str(target), "text": "\n".join(lines)}
+    ws.update_state(
+        last_check=report
+    )  # the path is local and private; it is returned, not stored
+    return {
+        "ok": True,
+        "summary": f"check written to {target}",
+        "report": report,
+        "path": str(target),
+        "text": "\n".join(lines),
+    }
 
 
 def data_dir_path(data_dir_arg) -> Path:
@@ -303,8 +409,17 @@ def image_search(
     """
     ws = _ws(folder)
     hits = _images.search_images(ws, query, n=n, searcher=searcher)
-    lines = [f"{i}. {_images.credit_line(h)}\n   {h['url']}" + (f"\n   page: {h['page']}" if h.get("page") else "") for i, h in enumerate(hits, 1)]
-    return {"ok": True, "summary": f"{len(hits)} candidate(s) for {query!r}", "hits": hits, "text": "\n".join(lines) or "no candidates"}
+    lines = [
+        f"{i}. {_images.credit_line(h)}\n   {h['url']}"
+        + (f"\n   page: {h['page']}" if h.get("page") else "")
+        for i, h in enumerate(hits, 1)
+    ]
+    return {
+        "ok": True,
+        "summary": f"{len(hits)} candidate(s) for {query!r}",
+        "hits": hits,
+        "text": "\n".join(lines) or "no candidates",
+    }
 
 
 def image_generate(
@@ -325,9 +440,18 @@ def image_generate(
     ws = _ws(folder)
     prefs = _prefs(data_dir, files)
     result = _images.generate_image(
-        ws, prompt, name=name, max_generated=int(prefs["max_generated_images"]), force=force, generator=generator
+        ws,
+        prompt,
+        name=name,
+        max_generated=int(prefs["max_generated_images"]),
+        force=force,
+        generator=generator,
     )
-    text = f"generated {result['file']}" if result["generated"] else f"not generated: {result['reason']}"
+    text = (
+        f"generated {result['file']}"
+        if result["generated"]
+        else f"not generated: {result['reason']}"
+    )
     return {"ok": True, "summary": text, **result, "text": text}
 
 
@@ -342,15 +466,28 @@ def image_add(
 ) -> dict:
     """Add an image (a URL or a local file) to img/ with its credit; ``--prompt`` if a person generated it."""
     ws = _ws(folder)
-    path = _images.add_image(ws, source, name=name, credit=credit, license=license, prompt=prompt)
+    path = _images.add_image(
+        ws, source, name=name, credit=credit, license=license, prompt=prompt
+    )
     rel = f"img/{path.name}"
-    return {"ok": True, "summary": f"added {rel}", "file": rel, "markdown": f'![ALT]({rel} "{credit}")', "text": f"{rel}\n![ALT]({rel} \"{credit}\")"}
+    return {
+        "ok": True,
+        "summary": f"added {rel}",
+        "file": rel,
+        "markdown": f'![ALT]({rel} "{credit}")',
+        "text": f'{rel}\n![ALT]({rel} "{credit}")',
+    }
 
 
 # -- render, post, approve, publish ------------------------------------------------------
 
 
-def render(folder: str | None = None, *, raw_base: str | None = None, runner: Callable = subprocess.run) -> dict:
+def render(
+    folder: str | None = None,
+    *,
+    raw_base: str | None = None,
+    runner: Callable = subprocess.run,
+) -> dict:
     """Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.
 
     ``raw_base`` is worked out from the checkout (owner, repo, commit, folder) when
@@ -363,20 +500,30 @@ def render(folder: str | None = None, *, raw_base: str | None = None, runner: Ca
     checkout = _gh.repo_of_checkout(ws.folder, runner=runner)
     if raw_base is None:
         if not checkout:
-            raise PenultError("the workspace is not in a GitHub checkout; pass --raw-base <url prefix for its files>")
+            raise PenultError(
+                "the workspace is not in a GitHub checkout; pass --raw-base <url prefix for its files>"
+            )
         raw_base = _gh.raw_url_base(checkout, ws.folder)
     version = int(state.get("draft_version", 0)) + 1
     tree_url = ""
     if checkout:
-        rel = ws.folder.resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
+        rel = (
+            ws.folder.resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
+        )
         # the folder link points at the same commit as the images, which a given
         # raw_base may pin to a commit other than the local HEAD
-        found = re.match(r"https://raw\.githubusercontent\.com/[^/]+/[^/]+/([^/]+)/", raw_base)
+        found = re.match(
+            r"https://raw\.githubusercontent\.com/[^/]+/[^/]+/([^/]+)/", raw_base
+        )
         ref = found.group(1) if found else checkout["sha"]
         tree_url = f"https://github.com/{checkout['owner']}/{checkout['repo']}/tree/{ref}/{rel}"
     footer = (
         f"*Draft v{version}, made with penult from {state.get('issue', 'the issue')}. "
-        + (f"Research notes, images and the Substack-ready source are in [`{ws.folder.name}/`]({tree_url}). " if tree_url else "")
+        + (
+            f"Research notes, images and the Substack-ready source are in [`{ws.folder.name}/`]({tree_url}). "
+            if tree_url
+            else ""
+        )
         + "Comment with what to change; say when it is good to go and it becomes an unpublished "
         f"{state.get('platform', 'substack')} draft for you to check.*"
     )
@@ -386,15 +533,19 @@ def render(folder: str | None = None, *, raw_base: str | None = None, runner: Ca
     ws.update_state(rendered_hash=text_hash(markdown), rendered_missing=missing)
     return {
         "ok": not missing,
-        "summary": f"{ws.comment.name} written (draft v{version})" + (f"; {len(missing)} image file(s) missing" if missing else ""),
+        "summary": f"{ws.comment.name} written (draft v{version})"
+        + (f"; {len(missing)} image file(s) missing" if missing else ""),
         "path": str(ws.comment),
         "version": version,
         "missing_images": missing,
-        "text": f"{ws.comment}\nimages referenced: {len(local_images(markdown))}" + ("\nMISSING: " + ", ".join(missing) if missing else ""),
+        "text": f"{ws.comment}\nimages referenced: {len(local_images(markdown))}"
+        + ("\nMISSING: " + ", ".join(missing) if missing else ""),
     }
 
 
-def post(folder: str | None = None, *, new: bool = False, runner: Callable = subprocess.run) -> dict:
+def post(
+    folder: str | None = None, *, new: bool = False, runner: Callable = subprocess.run
+) -> dict:
     """Post comment.md on the issue (or update the comment posted last time; ``--new`` posts another).
 
     Refuses while comment.md is older than essay.md, while an image the essay shows is
@@ -407,11 +558,15 @@ def post(folder: str | None = None, *, new: bool = False, runner: Callable = sub
     state = ws.read_state()
     markdown = _essay_text(ws)
     if state.get("rendered_hash") != text_hash(markdown):
-        raise PenultError("essay.md changed since the last render; run penult render first")
+        raise PenultError(
+            "essay.md changed since the last render; run penult render first"
+        )
     images = [ws.folder / p for p in local_images(markdown)]
     missing = [str(p.relative_to(ws.folder)) for p in images if not p.is_file()]
     if missing:
-        raise PenultError("the essay shows images that do not exist: " + ", ".join(missing))
+        raise PenultError(
+            "the essay shows images that do not exist: " + ", ".join(missing)
+        )
     checkout = _gh.repo_of_checkout(ws.folder, runner=runner)
     if checkout:
         behind = _gh.unpushed(checkout, images, runner=runner)
@@ -427,9 +582,20 @@ def post(folder: str | None = None, *, new: bool = False, runner: Callable = sub
         url = _gh.post_comment(state["issue"], ws.comment, runner=runner)
         what = "posted"
     version = int(state.get("draft_version", 0)) + 1
-    ws.update_state(comment_url=url, draft_version=version, posted=now(), posted_hash=text_hash(markdown))
+    ws.update_state(
+        comment_url=url,
+        draft_version=version,
+        posted=now(),
+        posted_hash=text_hash(markdown),
+    )
     ws.advance("posted")
-    return {"ok": True, "summary": f"{what} draft v{version}: {url}", "comment_url": url, "version": version, "text": f"{what} draft v{version}\n{url}"}
+    return {
+        "ok": True,
+        "summary": f"{what} draft v{version}: {url}",
+        "comment_url": url,
+        "version": version,
+        "text": f"{what} draft v{version}\n{url}",
+    }
 
 
 def approve(folder: str | None = None, *, by: str = "the user", note: str = "") -> dict:
@@ -442,17 +608,33 @@ def approve(folder: str | None = None, *, by: str = "the user", note: str = "") 
     ws = _ws(folder)
     state = ws.read_state()
     if state.get("stage") not in ("posted", "approved", "published"):
-        raise PenultError("nothing has been posted for review yet (penult post), so there is nothing to approve")
+        raise PenultError(
+            "nothing has been posted for review yet (penult post), so there is nothing to approve"
+        )
     digest = text_hash(_essay_text(ws))
     if state.get("posted_hash") and state["posted_hash"] != digest:
-        raise PenultError("essay.md changed since it was posted; render and post it again so the person approves what they see")
-    ws.update_state(approved={"by": by, "at": now(), "note": note, "essay_hash": digest})
+        raise PenultError(
+            "essay.md changed since it was posted; render and post it again so the person approves what they see"
+        )
+    ws.update_state(
+        approved={"by": by, "at": now(), "note": note, "essay_hash": digest}
+    )
     ws.advance("approved")
-    return {"ok": True, "summary": f"approved by {by}", "text": f"approved by {by}; next: penult publish"}
+    return {
+        "ok": True,
+        "summary": f"approved by {by}",
+        "text": f"approved by {by}; next: penult publish",
+    }
 
 
 def article_publisher(
-    platform: str, essay: Path, *, prefs: dict, dry_run: bool, update: bool, runner: Callable = subprocess.run
+    platform: str,
+    essay: Path,
+    *,
+    prefs: dict,
+    dry_run: bool,
+    update: bool,
+    runner: Callable = subprocess.run,
 ) -> dict:
     """The default publisher: the ``article`` package, as a command, returning its JSON record.
 
@@ -461,20 +643,39 @@ def article_publisher(
     Substack post is live.
     """
     if importlib.util.find_spec("article") is None:
-        raise PenultError("the article package is not installed: pip install 'penult[publish]'")
-    common = ["-e", os.path.expanduser(prefs["article_env_file"]), "-s", os.path.expanduser(prefs["article_state_path"]), "--json-out"]
+        raise PenultError(
+            "the article package is not installed: pip install 'penult[publish]'"
+        )
+    common = [
+        "-e",
+        os.path.expanduser(prefs["article_env_file"]),
+        "-s",
+        os.path.expanduser(prefs["article_state_path"]),
+        "--json-out",
+    ]
     if platform == "substack":
-        args = ["draft-substack", str(essay), *common] + (["--dry-run"] if dry_run else ["--update"] if update else [])
+        args = ["draft-substack", str(essay), *common] + (
+            ["--dry-run"] if dry_run else ["--update"] if update else []
+        )
     elif platform == "medium":
         if dry_run:
-            raise PenultError("--dry-run is a Substack check; Medium is an import step with nothing to convert")
+            raise PenultError(
+                "--dry-run is a Substack check; Medium is an import step with nothing to convert"
+            )
         args = ["syndicate-secondary", str(essay), *common, "--platforms", "medium"]
     else:
         raise PenultError(f"unknown platform {platform!r}; substack or medium")
-    done = runner([sys.executable, "-m", "article", *args], capture_output=True, text=True, timeout=_TIMEOUT)
+    done = runner(
+        [sys.executable, "-m", "article", *args],
+        capture_output=True,
+        text=True,
+        timeout=_TIMEOUT,
+    )
     out = (done.stdout or "").strip()
     if done.returncode != 0:
-        raise PenultError(f"article failed:\n{out}\n{(done.stderr or '').strip()}".strip())
+        raise PenultError(
+            f"article failed:\n{out}\n{(done.stderr or '').strip()}".strip()
+        )
     try:
         record = json.loads(out)
     except ValueError:
@@ -482,8 +683,16 @@ def article_publisher(
     if dry_run:
         return {"draft_url": None, "record": record, "text": out}
     results = record.get("results") or []
-    detail = next((r.get("detail") or {} for r in results if r.get("platform") == platform), {})
-    return {"draft_url": detail.get("edit_url") or detail.get("url") or next((r.get("url") for r in results), None), "record": record, "text": out}
+    detail = next(
+        (r.get("detail") or {} for r in results if r.get("platform") == platform), {}
+    )
+    return {
+        "draft_url": detail.get("edit_url")
+        or detail.get("url")
+        or next((r.get("url") for r in results), None),
+        "record": record,
+        "text": out,
+    }
 
 
 def publish(
@@ -511,12 +720,21 @@ def publish(
     approved = state.get("approved") or {}
     if not dry_run:
         if not approved:
-            raise PenultError("the person has not approved the posted draft (penult approve); use --dry-run to check the conversion only")
+            raise PenultError(
+                "the person has not approved the posted draft (penult approve); use --dry-run to check the conversion only"
+            )
         if approved.get("essay_hash") != digest:
-            raise PenultError("essay.md changed since it was approved; post it again and have the person approve the new text")
+            raise PenultError(
+                "essay.md changed since it was approved; post it again and have the person approve the new text"
+            )
     drafts = dict(state.get("draft_urls") or {})
     result = (publisher or article_publisher)(
-        platform, ws.essay, prefs=prefs, dry_run=dry_run, update=bool(drafts.get(platform)), runner=runner
+        platform,
+        ws.essay,
+        prefs=prefs,
+        dry_run=dry_run,
+        update=bool(drafts.get(platform)),
+        runner=runner,
     )
     if not dry_run:
         if result.get("draft_url"):
@@ -534,14 +752,34 @@ def publish(
 def prefs(*, data_dir: str | None = None, files: MutableMapping | None = None) -> dict:
     """The private preferences (defaults overlaid with what the person set)."""
     current = preferences(data_dir=data_dir, files=files)
-    lines = [f"{k}: {json.dumps(v)}" + ("" if DEFAULT_PREFERENCES.get(k) != v else "  (default)") for k, v in current.items()]
-    return {"ok": True, "summary": f"{len(current)} preferences", "preferences": current, "text": "\n".join(lines)}
+    lines = [
+        f"{k}: {json.dumps(v)}"
+        + ("" if DEFAULT_PREFERENCES.get(k) != v else "  (default)")
+        for k, v in current.items()
+    ]
+    return {
+        "ok": True,
+        "summary": f"{len(current)} preferences",
+        "preferences": current,
+        "text": "\n".join(lines),
+    }
 
 
-def prefs_set(key: str, value: str, *, data_dir: str | None = None, files: MutableMapping | None = None) -> dict:
+def prefs_set(
+    key: str,
+    value: str,
+    *,
+    data_dir: str | None = None,
+    files: MutableMapping | None = None,
+) -> dict:
     """Set one preference; the value must have the default's type (``2``, ``'["me","dfw"]'``, text)."""
     current = set_preference(key, value, data_dir=data_dir, files=files)
-    return {"ok": True, "summary": f"{key} = {json.dumps(current[key])}", "preferences": current, "text": f"{key}: {json.dumps(current[key])}"}
+    return {
+        "ok": True,
+        "summary": f"{key} = {json.dumps(current[key])}",
+        "preferences": current,
+        "text": f"{key}: {json.dumps(current[key])}",
+    }
 
 
 #: The one list every surface is built from. Never write a second one.

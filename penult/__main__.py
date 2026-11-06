@@ -41,7 +41,9 @@ def _command(func):
 def _egress(as_json):
     def egress(result, *, out, err):
         if as_json or not isinstance(result, dict):
-            print(json.dumps(result, indent=2, ensure_ascii=False, default=str), file=out)
+            print(
+                json.dumps(result, indent=2, ensure_ascii=False, default=str), file=out
+            )
         else:
             print(result.get("text") or result.get("summary") or "", file=out)
         return 0 if not isinstance(result, dict) or result.get("ok", True) else 1
