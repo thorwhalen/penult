@@ -213,7 +213,6 @@ def brief_markdown(issue: dict[str, Any], prefs: dict[str, Any], thin: dict[str,
     seed is thin, from the seed and these preferences otherwise), and the decisions
     stay here so a later session can see what was assumed.
     """
-    voice = ", ".join(prefs.get("voice_models") or ["me"])
     verdict = (
         "THIN: ask the user first (" + "; ".join(thin["reasons"]) + "), with a recommendation for each question."
         if thin["thin"]
@@ -239,8 +238,8 @@ def brief_markdown(issue: dict[str, Any], prefs: dict[str, Any], thin: dict[str,
             "",
             "## Voice",
             "",
-            f"Base voice: `{voice}` (penlike register `{prefs.get('voice_register', 'essay')}`). "
-            "Other authors: chosen with `penlike guide` for this subject. [DECIDE: which, for which passages]",
+            f"Base voice: the author's own (penlike register `{prefs.get('voice_register', 'essay')}`); other voices chosen with `penlike guide` for this subject. "
+            "This file is committed with the essay, so name the *roles* a borrowed voice plays (an ironic aside, a deadpan numbers passage), never the models or the guide's contents. [DECIDE: which roles, for which passages]",
             "",
             "## Research",
             "",

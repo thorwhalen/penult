@@ -26,6 +26,7 @@ import importlib.util
 import inspect
 import json
 import os
+import re
 import subprocess
 import sys
 from collections.abc import MutableMapping
@@ -276,7 +277,7 @@ def check(
     target = Path(out).expanduser() if out else data_dir_path(data_dir) / "work" / ws.folder.name / "check.md"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
-    ws.update_state(last_check={**report, "path": str(target)})
+    ws.update_state(last_check=report)  # the path is local and private; it is returned, not stored
     return {"ok": True, "summary": f"check written to {target}", "report": report, "path": str(target), "text": "\n".join(lines)}
 
 
@@ -368,7 +369,11 @@ def render(folder: str | None = None, *, raw_base: str | None = None, runner: Ca
     tree_url = ""
     if checkout:
         rel = ws.folder.resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
-        tree_url = f"https://github.com/{checkout['owner']}/{checkout['repo']}/tree/{checkout['sha']}/{rel}"
+        # the folder link points at the same commit as the images, which a given
+        # raw_base may pin to a commit other than the local HEAD
+        found = re.match(r"https://raw\.githubusercontent\.com/[^/]+/[^/]+/([^/]+)/", raw_base)
+        ref = found.group(1) if found else checkout["sha"]
+        tree_url = f"https://github.com/{checkout['owner']}/{checkout['repo']}/tree/{ref}/{rel}"
     footer = (
         f"*Draft v{version}, made with penult from {state.get('issue', 'the issue')}. "
         + (f"Research notes, images and the Substack-ready source are in [`{ws.folder.name}/`]({tree_url}). " if tree_url else "")
