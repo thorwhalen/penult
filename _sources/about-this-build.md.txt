@@ -5,17 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-11-06 13:15 UTC** from commit <a href="https://github.com/thorwhalen/penult/commit/ab5a4da447d5c8a6785e5d06e1c0105614f2243c"><code>ab5a4da</code></a> on branch <code>main</code>, for **penult 0.0.2** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-21 18:18 UTC** from commit <a href="https://github.com/thorwhalen/penult/commit/1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5"><code>1605f5d</code></a> on branch <code>main</code>, for **penult 0.0.3** (from <code>pyproject.toml</code>).
 
-:::{note}
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+:::{warning}
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.3) is behind the latest release on PyPI (0.0.4): `pip install penult` gives newer code than these docs describe.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/penult/commit/ab5a4da447d5c8a6785e5d06e1c0105614f2243c"><code>ab5a4da447d5c8a6785e5d06e1c0105614f2243c</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/penult/commit/1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5"><code>1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -26,15 +28,15 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>thorwhalen/penult</code> |
-| Run | <a href="https://github.com/thorwhalen/penult/actions/runs/42223881027">42223881027</a> |
+| Run | <a href="https://github.com/thorwhalen/penult/actions/runs/44934643088">44934643088</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>ab5a4da447d5c8a6785e5d06e1c0105614f2243c</code> (in the history of the built commit) |
+| Event commit | <code>1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5</code> (in the history of the built commit) |
 
 ## Tools
 
 | | |
 |---|---|
-| epythet | 0.2.22 |
+| epythet | 0.2.23 |
 | Sphinx | 9.1.1 |
 | docutils | 0.22.4 |
 | Python | 3.12.16 |
@@ -53,14 +55,14 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/penult/0.0.2/">0.0.2</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/penult/0.0.4/">0.0.4</a>, newer than the documented version (0.0.3).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/penult && cd penult
-git checkout ab5a4da447d5c8a6785e5d06e1c0105614f2243c
-pip install "epythet==0.2.22"
+git checkout 1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
