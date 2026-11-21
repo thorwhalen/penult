@@ -105,10 +105,10 @@ def text_files(root: str | os.PathLike) -> MutableMapping[str, str]:
     files = mk_dirs_if_missing(Files(str(root), delete_func=os.remove))
     return wrap_kvs(
         files,
-        key_of_id=lambda k: k.replace(os.sep, "/"),
-        id_of_key=lambda k: k.replace("/", os.sep),
-        obj_of_data=lambda b: b.decode("utf-8", errors="replace"),
-        data_of_obj=lambda s: s.encode("utf-8"),
+        key_decoder=lambda k: k.replace(os.sep, "/"),
+        key_encoder=lambda k: k.replace("/", os.sep),
+        value_decoder=lambda b: b.decode("utf-8", errors="replace"),
+        value_encoder=lambda s: s.encode("utf-8"),
     )
 
 
