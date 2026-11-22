@@ -251,3 +251,89 @@ def test_the_command_line_runs(tmp_path):
     assert done.returncode == 0 and "platform" in done.stdout
     done = sp.run([sys.executable, "-m", "penult", "status", str(tmp_path)], capture_output=True, text=True, env=env)
     assert done.returncode != 0 and "penult start" in done.stderr
+
+
+def test_finish_links_closes_and_archives_once(repo):
+    ws = repo / "docs" / "essay"
+    penult.start(ISSUE_URL, into=str(ws), files={}, fetch=lambda url: fake_issue(url))
+    (ws / "essay.md").write_text("---\ntitle: The Accretion Trap\n---\nBody text.\n", encoding="utf-8")
+    runner = FakeRunner(repo)
+    with pytest.raises(PenultError, match="nothing is published"):
+        penult.finish(str(ws), runner=runner)
+    penult.render(str(ws), runner=runner)
+    penult.post(str(ws), runner=runner)
+    penult.approve(str(ws), by="octo")
+    penult.publish(str(ws), files={}, runner=runner)
+
+    bodies, graphql = {}, []
+    base = FakeRunner.__call__
+
+    def run(args, **kwargs):
+        if args[:3] == ["gh", "issue", "edit"]:
+            bodies["issue"] = Path(args[args.index("--body-file") + 1]).read_text()
+            return subprocess.CompletedProcess(args, 0, stdout="", stderr="")
+        if args[:3] == ["gh", "issue", "close"]:
+            return subprocess.CompletedProcess(args, 0, stdout="", stderr="")
+        if args[:3] == ["gh", "api", "graphql"]:
+            sent = json.loads(kwargs["input"])
+            query = sent["query"]
+            graphql.append(query)
+            if "discussionCategories" in query:
+                out = {"repository": {"id": "R1", "discussionCategories": {"nodes": [{"id": "C1", "name": "General"}]}}}
+            elif "createDiscussion" in query:
+                out = {"createDiscussion": {"discussion": {"id": "D1", "url": "https://github.com/octo/essays/discussions/7"}}}
+            else:
+                out = {"updateDiscussion": {"discussion": {"id": "D1", "url": "https://github.com/octo/essays/discussions/7"}}}
+            bodies["discussion"] = sent["variables"].get("body", bodies.get("discussion", ""))
+            return subprocess.CompletedProcess(args, 0, stdout=json.dumps({"data": out}), stderr="")
+        return base(runner, args, **kwargs)
+
+    fetch = lambda url: fake_issue(url, body="Seed body.")
+    first = penult.finish(str(ws), runner=run, fetch=fetch)
+    assert first["discussion_url"].endswith("/discussions/7")
+    assert bodies["issue"].startswith("> **Unpublished substack draft (editor link, private to the author):** https://octo.substack.com/publish/post/42")
+    assert bodies["issue"].endswith("Seed body.")
+    assert "Draft v" not in bodies["discussion"] and "Body text." in bodies["discussion"]
+    assert "From [octo/essays#30]" in bodies["discussion"]
+    assert "substack.com/publish" not in bodies["discussion"]  # the private editor link stays off the public copies
+    assert "mutation" in graphql[-1] and "createDiscussion" in graphql[-1]
+
+    # the public link replaces the private one in the body; the discussion is updated, not made again
+    again = penult.finish(str(ws), url="https://octo.substack.com/p/x", runner=run,
+                          fetch=lambda url: fake_issue(url, body=bodies["issue"]))
+    assert bodies["issue"].count("penult:link") == 1 and "Published on substack:** https://octo.substack.com/p/x" in bodies["issue"]
+    assert "editor link" not in bodies["issue"]
+    assert "https://octo.substack.com/p/x" in bodies["discussion"]
+    assert "updateDiscussion" in graphql[-1] and again["discussion_url"] == first["discussion_url"]
+    assert penult.status(str(ws))["state"]["public_url"] == "https://octo.substack.com/p/x"
+
+
+def test_finish_rerun_after_a_failed_discussion_does_not_comment_twice(repo):
+    ws = repo / "docs" / "essay"
+    penult.start(ISSUE_URL, into=str(ws), files={}, fetch=lambda url: fake_issue(url))
+    (ws / "essay.md").write_text("---\ntitle: T\n---\nBody.\n", encoding="utf-8")
+    runner = FakeRunner(repo)
+    penult.render(str(ws), runner=runner); penult.post(str(ws), runner=runner)
+    penult.approve(str(ws), by="octo"); penult.publish(str(ws), files={}, runner=runner)
+    state = {"fail": True, "comments": 0}
+    base = FakeRunner.__call__
+
+    def run(args, **kwargs):
+        if args[:3] == ["gh", "issue", "comment"]:
+            state["comments"] += 1
+        if args[:3] == ["gh", "api", "graphql"]:
+            if state["fail"]:
+                return subprocess.CompletedProcess(args, 1, stdout="", stderr="Discussions are disabled")
+            out = {"repository": {"id": "R", "discussionCategories": {"nodes": [{"id": "C", "name": "General"}]}},
+                   "createDiscussion": {"discussion": {"id": "D", "url": "https://x/d"}}}
+            return subprocess.CompletedProcess(args, 0, stdout=json.dumps({"data": out}), stderr="")
+        if args[:3] in (["gh", "issue", "edit"], ["gh", "issue", "close"]):
+            return subprocess.CompletedProcess(args, 0, stdout="", stderr="")
+        return base(runner, args, **kwargs)
+
+    fetch = lambda url: fake_issue(url, body="Seed.")
+    with pytest.raises(PenultError, match="Discussions are disabled"):
+        penult.finish(str(ws), runner=run, fetch=fetch)
+    state["fail"] = False
+    penult.finish(str(ws), runner=run, fetch=fetch)
+    assert state["comments"] == 1  # the second run edited the closing comment

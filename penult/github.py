@@ -20,13 +20,16 @@ from urllib.parse import quote
 from penult.base import PenultError
 
 __all__ = [
+    "close_issue",
     "edit_comment",
+    "edit_issue_body",
     "fetch_issue",
     "parse_issue_url",
     "post_comment",
     "raw_url_base",
     "repo_of_checkout",
     "unpushed",
+    "upsert_discussion",
 ]
 
 Runner = Callable[..., Any]
@@ -124,6 +127,101 @@ def edit_comment(
         input=payload,
     )  # fmt: skip
     return comment_url
+
+
+def edit_issue_body(
+    url: str, body_file: Path, *, runner: Runner = subprocess.run
+) -> str:
+    """Replace the issue's body with a file's content; returns the issue URL."""
+    owner, repo, number = parse_issue_url(url)
+    _run(
+        runner,
+        ["gh", "issue", "edit", str(number), "-R", f"{owner}/{repo}", "--body-file", str(body_file)],
+        what=f"edit the body of {owner}/{repo}#{number}",
+    )  # fmt: skip
+    return url
+
+
+def close_issue(url: str, *, runner: Runner = subprocess.run) -> str:
+    """Close the issue (already closed is fine); returns the issue URL."""
+    owner, repo, number = parse_issue_url(url)
+    _run(
+        runner,
+        ["gh", "issue", "close", str(number), "-R", f"{owner}/{repo}"],
+        what=f"close {owner}/{repo}#{number}",
+    )  # fmt: skip
+    return url
+
+
+_REPO_AND_CATEGORIES = """
+query($owner: String!, $repo: String!) {
+  repository(owner: $owner, name: $repo) {
+    id
+    discussionCategories(first: 50) { nodes { id name } }
+  }
+}"""
+_CREATE_DISCUSSION = """
+mutation($repo: ID!, $category: ID!, $title: String!, $body: String!) {
+  createDiscussion(input: {repositoryId: $repo, categoryId: $category, title: $title, body: $body}) {
+    discussion { id url }
+  }
+}"""
+_UPDATE_DISCUSSION = """
+mutation($id: ID!, $title: String!, $body: String!) {
+  updateDiscussion(input: {discussionId: $id, title: $title, body: $body}) {
+    discussion { id url }
+  }
+}"""
+
+
+def _graphql(runner: Runner, query: str, *, what: str, **variables: str) -> dict:
+    # the JSON goes on stdin: an essay is too long for an argument and would show in ps
+    payload = json.dumps({"query": query, "variables": variables})
+    out = _run(runner, ["gh", "api", "graphql", "--input", "-"], what=what, input=payload)
+    return json.loads(out or "{}").get("data") or {}
+
+
+def upsert_discussion(
+    owner: str,
+    repo: str,
+    *,
+    title: str,
+    body: str,
+    category: str = "General",
+    discussion_id: str | None = None,
+    runner: Runner = subprocess.run,
+) -> dict[str, str]:
+    """Create the discussion in ``category``, or update the one with ``discussion_id``; ``{"id", "url"}``."""
+    if discussion_id:
+        data = _graphql(
+            runner, _UPDATE_DISCUSSION, what="update the discussion",
+            id=discussion_id, title=title, body=body,
+        )  # fmt: skip
+        found = (data.get("updateDiscussion") or {}).get("discussion")
+    else:
+        info = _graphql(
+            runner, _REPO_AND_CATEGORIES, what="read the discussion categories",
+            owner=owner, repo=repo,
+        )  # fmt: skip
+        repository = info.get("repository") or {}
+        categories = {
+            c["name"].lower(): c["id"]
+            for c in (repository.get("discussionCategories") or {}).get("nodes") or []
+        }
+        if category.lower() not in categories:
+            raise PenultError(
+                f"{owner}/{repo} has no discussion category {category!r} "
+                f"(has: {', '.join(sorted(categories)) or 'none; enable Discussions'})"
+            )
+        data = _graphql(
+            runner, _CREATE_DISCUSSION, what="create the discussion",
+            repo=repository["id"], category=categories[category.lower()],
+            title=title, body=body,
+        )  # fmt: skip
+        found = (data.get("createDiscussion") or {}).get("discussion")
+    if not found:
+        raise PenultError("GitHub did not return the discussion")
+    return {"id": found["id"], "url": found["url"]}
 
 
 def repo_of_checkout(

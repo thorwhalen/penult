@@ -29,6 +29,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any, Callable
@@ -832,6 +833,126 @@ def publish(
             "dry_run": dry_run, "text": (f"{platform} draft: {link}\n" if link else "") + (result.get("text") or "")}  # fmt: skip
 
 
+# -- finish ----------------------------------------------------------------------------
+
+#: Marks the line ``finish`` keeps at the top of the issue body, so a later run finds it.
+LINK_MARKER = "<!-- penult:link -->"
+_FOOTER_RULE = "\n---\n\n*Draft v"
+
+
+def _with_link_line(body: str, line: str) -> str:
+    """The issue body with ``line`` as its first line, replacing an earlier link line.
+
+    >>> _with_link_line("Text", "> L")
+    '> L <!-- penult:link -->\\n\\nText'
+    >>> _with_link_line("> old <!-- penult:link -->\\n\\nText", "> new")
+    '> new <!-- penult:link -->\\n\\nText'
+    """
+    kept = [l for l in body.replace("\r\n", "\n").split("\n") if LINK_MARKER not in l]
+    body = "\n".join(kept).lstrip("\n")
+    return f"{line} {LINK_MARKER}\n\n{body}"
+
+
+def _without_footer(comment: str) -> str:
+    """The posted draft without its review footer (the last ``---`` rule before ``*Draft v``)."""
+    head, rule, _ = comment.rpartition(_FOOTER_RULE)
+    return head.rstrip() if rule else comment.rstrip()
+
+
+def finish(
+    folder: str | None = None,
+    *,
+    url: str | None = None,
+    category: str = "General",
+    fetch: Callable[..., dict] | None = None,
+    runner: Callable = subprocess.run,
+) -> dict:
+    """After ``publish``: link the issue, close it, and archive the final text as a Discussion.
+
+    Three steps, each safe to repeat. (1) the link goes on the very top of the issue
+    body, as a quote line; (2) the issue is closed with a comment carrying the link;
+    (3) the last posted draft, without its review footer, goes to a Discussion in
+    the same repository under ``--category``, with one provenance line on top
+    (issue, platform, source folder). Until the post is public, the link is the
+    draft's editor link, named as private to the author; run ``penult finish --url
+    <public url>`` later and it replaces the link in the body, the comment and the
+    discussion. The comment and discussion are updated in place, never duplicated.
+    """
+    ws = _ws(folder)
+    state = ws.read_state()
+    if state.get("stage") != "published":
+        raise PenultError("nothing is published yet (penult publish), so there is nothing to finish")
+    if not ws.comment.is_file():
+        raise PenultError(f"no {ws.comment.name}; the final text is the last posted draft")
+    issue_url = state["issue"]
+    platform = state.get("published_to") or state.get("platform") or "substack"
+    public = url or state.get("public_url")
+    editor = (state.get("draft_urls") or {}).get(platform)
+    if public:
+        link, label = public, f"Published on {platform}"
+    elif editor:
+        link, label = editor, f"Unpublished {platform} draft (editor link, private to the author)"
+    else:
+        raise PenultError("there is no link to show yet: no draft URL in the state; pass --url <public url>")
+    link_line = f"> **{label}:** {link}"
+
+    if url:
+        ws.update_state(public_url=url)  # first: a rerun without --url must not downgrade the link
+    issue = (fetch or functools.partial(_gh.fetch_issue, runner=runner))(issue_url)
+    owner, repo, number = _gh.parse_issue_url(issue_url)
+    checkout = _gh.repo_of_checkout(ws.folder, runner=runner)
+    source = (
+        ws.folder.resolve().relative_to(Path(checkout["root"]).resolve()).as_posix()
+        if checkout
+        else ws.folder.name
+    )
+    # A draft's editor link is private to the author: it goes on the issue body only,
+    # never into the close comment or the discussion, which may be public.
+    provenance = (
+        f"*From [{owner}/{repo}#{number}]({issue_url}); {label.lower()}"
+        + (f": {link}" if public else "")
+        + f"; source folder `{source}`.*"
+    )
+    closing = f"Done: {label.lower()}." + (f"\n\n{link}" if public else "")
+    title = essay_fields(_essay_text(ws)).get("title") or issue["title"]
+    with tempfile.TemporaryDirectory() as tmp:
+        def as_file(name: str, text: str) -> Path:
+            path = Path(tmp) / name
+            path.write_text(text, encoding="utf-8")
+            return path
+
+        # Each step is saved as soon as it is done, so a rerun after a failure updates
+        # what exists instead of making a second comment or discussion. The step most
+        # likely to fail (Discussions disabled, no such category) goes before the
+        # issue is touched.
+        closing_file = as_file("closing.md", closing)
+        if state.get("close_comment_url"):
+            closing_url = _gh.edit_comment(state["close_comment_url"], closing_file, runner=runner)
+        else:
+            closing_url = _gh.post_comment(issue_url, closing_file, runner=runner)
+        ws.update_state(close_comment_url=closing_url)
+        known = state.get("discussion") or {}
+        discussion = _gh.upsert_discussion(
+            owner, repo, title=title,
+            body=provenance + "\n\n" + _without_footer(ws.comment.read_text(encoding="utf-8")),
+            category=category, discussion_id=known.get("id"), runner=runner,
+        )  # fmt: skip
+        ws.update_state(discussion=discussion)
+        _gh.edit_issue_body(
+            issue_url, as_file("body.md", _with_link_line(issue["body"], link_line)), runner=runner
+        )
+        _gh.close_issue(issue_url, runner=runner)
+    ws.update_state(finished=now())
+    return {
+        "ok": True,
+        "summary": f"issue closed, linked and archived: {discussion['url']}",
+        "discussion_url": discussion["url"],
+        "close_comment_url": closing_url,
+        "link": link,
+        "text": f"{label}: {link}\nclosed {issue_url}\narchived: {discussion['url']}",
+    }
+
+
 # -- preferences -----------------------------------------------------------------------
 
 
@@ -872,6 +993,6 @@ def prefs_set(
 TOOLS = [
     start, status, mark, check,
     image_search, image_generate, image_add,
-    layout, render, post, approve, publish,
+    layout, render, post, approve, publish, finish,
     prefs, prefs_set,
 ]  # fmt: skip
