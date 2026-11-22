@@ -1,4 +1,4 @@
-> built 2026-11-21 18:18 UTC from 1605f5d (main) · penult 0.0.3. Details: build_info.json
+> built 2026-11-22 12:54 UTC from da8724b (main) · penult 0.0.4. Details: build_info.json
 
 # index.html.md
 
@@ -24,6 +24,7 @@ penult layout docs/<slug> --apply                         # size class per image
 penult render docs/<slug> && penult post docs/<slug>      # the essay as an issue comment, images by raw URL
 penult approve docs/<slug> --note "good to go"            # the author's words; this gates publishing
 penult publish docs/<slug>                                # an unpublished Substack draft; you press Publish
+penult finish docs/<slug> [--url <public url>]            # link on the issue, close it, archive the text as a Discussion; repeat with --url once it is public
 ```
 
 ## What penult holds, and what the agent does
@@ -336,18 +337,35 @@ an authenticated `gh`.
 
 ### Functions
 
-| [`edit_comment`](_autosummary/penult.github.html.md#penult.github.edit_comment)(comment_url, body_file, \*[, runner])   | Replace an existing comment's body (`comment_url` ends in `#issuecomment-<id>`).        |
-|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| [`fetch_issue`](_autosummary/penult.github.html.md#penult.github.fetch_issue)(url, \*[, runner])                       | The issue's title, body, labels and comments, as one JSON-ready dict.                   |
-| [`parse_issue_url`](_autosummary/penult.github.html.md#penult.github.parse_issue_url)(url)                                 | `(owner, repo, number)` from an issue URL, or an error that shows the shape.            |
-| [`post_comment`](_autosummary/penult.github.html.md#penult.github.post_comment)(url, body_file, \*[, runner])           | Post a file's content as a comment on the issue; returns the comment's URL.             |
-| [`raw_url_base`](_autosummary/penult.github.html.md#penult.github.raw_url_base)(checkout, folder)                       | The `raw.githubusercontent.com` prefix for files in `folder` at the checkout's commit.  |
-| [`repo_of_checkout`](_autosummary/penult.github.html.md#penult.github.repo_of_checkout)(path, \*[, runner])                 | The checkout holding `path`: its root, GitHub owner/repo, branch and commit, or `None`. |
-| [`unpushed`](_autosummary/penult.github.html.md#penult.github.unpushed)(checkout, paths, \*[, runner])              | Which of `paths` are not yet committed and pushed to the branch's upstream.             |
+| [`close_issue`](_autosummary/penult.github.html.md#penult.github.close_issue)(url, \*[, runner])                     | Close the issue (already closed is fine); returns the issue URL.                              |
+|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| [`edit_comment`](_autosummary/penult.github.html.md#penult.github.edit_comment)(comment_url, body_file, \*[, runner]) | Replace an existing comment's body (`comment_url` ends in `#issuecomment-<id>`).              |
+| [`edit_issue_body`](_autosummary/penult.github.html.md#penult.github.edit_issue_body)(url, body_file, \*[, runner])      | Replace the issue's body with a file's content; returns the issue URL.                        |
+| [`fetch_issue`](_autosummary/penult.github.html.md#penult.github.fetch_issue)(url, \*[, runner])                     | The issue's title, body, labels and comments, as one JSON-ready dict.                         |
+| [`parse_issue_url`](_autosummary/penult.github.html.md#penult.github.parse_issue_url)(url)                               | `(owner, repo, number)` from an issue URL, or an error that shows the shape.                  |
+| [`post_comment`](_autosummary/penult.github.html.md#penult.github.post_comment)(url, body_file, \*[, runner])         | Post a file's content as a comment on the issue; returns the comment's URL.                   |
+| [`raw_url_base`](_autosummary/penult.github.html.md#penult.github.raw_url_base)(checkout, folder)                     | The `raw.githubusercontent.com` prefix for files in `folder` at the checkout's commit.        |
+| [`repo_of_checkout`](_autosummary/penult.github.html.md#penult.github.repo_of_checkout)(path, \*[, runner])               | The checkout holding `path`: its root, GitHub owner/repo, branch and commit, or `None`.       |
+| [`unpushed`](_autosummary/penult.github.html.md#penult.github.unpushed)(checkout, paths, \*[, runner])            | Which of `paths` are not yet committed and pushed to the branch's upstream.                   |
+| [`upsert_discussion`](_autosummary/penult.github.html.md#penult.github.upsert_discussion)(owner, repo, \*, title, body)    | Create the discussion in `category`, or update the one with `discussion_id`; `{"id", "url"}`. |
+
+### penult.github.close_issue(url, \*, runner=<function run>)
+
+Close the issue (already closed is fine); returns the issue URL.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### penult.github.edit_comment(comment_url, body_file, \*, runner=<function run>)
 
 Replace an existing comment’s body (`comment_url` ends in `#issuecomment-<id>`).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### penult.github.edit_issue_body(url, body_file, \*, runner=<function run>)
+
+Replace the issue’s body with a file’s content; returns the issue URL.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -406,6 +424,13 @@ image it references is in this list. Paths are compared in git’s own form
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
+### penult.github.upsert_discussion(owner, repo, \*, title, body, category='General', discussion_id=None, runner=<function run>)
+
+Create the discussion in `category`, or update the one with `discussion_id`; `{"id", "url"}`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 
 # _autosummary/penult.html.md
 
@@ -442,6 +467,7 @@ in the `penult` skill; the verbs here keep every step from being improvised twic
 | [`prefs`](_autosummary/penult.html.md#penult.prefs)(\*[, data_dir, files])                       | The private preferences (defaults overlaid with what the person set).                               |
 | [`prefs_set`](_autosummary/penult.html.md#penult.prefs_set)(key, value, \*[, data_dir, files])       | Set one preference; the value must have the default's type (`2`, `'["me","dfw"]'`, text).           |
 | [`publish`](_autosummary/penult.html.md#penult.publish)([folder, platform, dry_run, ...])          | Hand the approved essay to the publisher for an **unpublished** draft on the platform.              |
+| [`finish`](_autosummary/penult.html.md#penult.finish)([folder, url, category, fetch, runner])     | After `publish`: link the issue, close it, and archive the final text as a Discussion.              |
 | [`render`](_autosummary/penult.html.md#penult.render)([folder, raw_base, data_dir, files, ...])   | Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.              |
 | [`start`](_autosummary/penult.html.md#penult.start)(seed, \*[, into, force, data_dir, ...])      | Fetch the seed (a GitHub issue URL) and make the workspace: seed, brief, state.                     |
 | [`status`](_autosummary/penult.html.md#penult.status)([folder])                                   | Where the workspace stands: stage, files present, images, the posted comment, what comes next.      |
@@ -558,6 +584,22 @@ True
 
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### penult.finish(folder=None, \*, url=None, category='General', fetch=None, runner=<function run>)
+
+After `publish`: link the issue, close it, and archive the final text as a Discussion.
+
+Three steps, each safe to repeat. (1) the link goes on the very top of the issue
+body, as a quote line; (2) the issue is closed with a comment carrying the link;
+(3) the last posted draft, without its review footer, goes to a Discussion in
+the same repository under `--category`, with one provenance line on top
+(issue, platform, source folder). Until the post is public, the link is the
+draft’s editor link, named as private to the author; run `penult finish --url
+<public url>` later and it replaces the link in the body, the comment and the
+discussion. The comment and discussion are updated in place, never duplicated.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### penult.image_add(source, , name, credit, folder=None, license='', prompt=None)
 
@@ -917,7 +959,7 @@ the injected callables are for Python callers and tests.
 * **Type:**
   Parameters a surface built from these signatures leaves out
 
-### penult.tools.TOOLS *= [<function start>, <function status>, <function mark>, <function check>, <function image_search>, <function image_generate>, <function image_add>, <function layout>, <function render>, <function post>, <function approve>, <function publish>, <function prefs>, <function prefs_set>]*
+### penult.tools.TOOLS *= [<function start>, <function status>, <function mark>, <function check>, <function image_search>, <function image_generate>, <function image_add>, <function layout>, <function render>, <function post>, <function approve>, <function publish>, <function finish>, <function prefs>, <function prefs_set>]*
 
 The one list every surface is built from. Never write a second one.
 
@@ -1083,18 +1125,18 @@ How many whitespace-separated words a text has.
 
 # About this build
 
-This documentation was built on **2026-11-21 18:18 UTC** from commit <a href="https://github.com/thorwhalen/penult/commit/1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5"><code>1605f5d</code></a> on branch <code>main</code>, for **penult 0.0.3** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 12:54 UTC** from commit <a href="https://github.com/thorwhalen/penult/commit/da8724be21c18633ac1c9da198afe36728107884"><code>da8724b</code></a> on branch <code>main</code>, for **penult 0.0.4** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.3) is behind the latest release on PyPI (0.0.4): `pip install penult` gives newer code than these docs describe.
+- The documented version (0.0.4) is behind the latest release on PyPI (0.0.5): `pip install penult` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/penult/commit/1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5"><code>1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/penult/commit/da8724be21c18633ac1c9da198afe36728107884"><code>da8724be21c18633ac1c9da198afe36728107884</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -1105,9 +1147,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/penult</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/penult/actions/runs/44934643088">44934643088</a>    |
+| Run          | <a href="https://github.com/thorwhalen/penult/actions/runs/45024586398">45024586398</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5</code> (in the history of the built commit) |
+| Event commit | <code>da8724be21c18633ac1c9da198afe36728107884</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -1132,13 +1174,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/penult/0.0.4/">0.0.4</a>, newer than the documented version (0.0.3).
+Latest release: <a href="https://pypi.org/project/penult/0.0.5/">0.0.5</a>, newer than the documented version (0.0.4).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/penult && cd penult
-git checkout 1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5
+git checkout da8724be21c18633ac1c9da198afe36728107884
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

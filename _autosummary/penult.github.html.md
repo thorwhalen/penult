@@ -13,18 +13,35 @@ an authenticated `gh`.
 
 ### Functions
 
-| [`edit_comment`](#penult.github.edit_comment)(comment_url, body_file, \*[, runner])   | Replace an existing comment's body (`comment_url` ends in `#issuecomment-<id>`).        |
-|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| [`fetch_issue`](#penult.github.fetch_issue)(url, \*[, runner])                       | The issue's title, body, labels and comments, as one JSON-ready dict.                   |
-| [`parse_issue_url`](#penult.github.parse_issue_url)(url)                                 | `(owner, repo, number)` from an issue URL, or an error that shows the shape.            |
-| [`post_comment`](#penult.github.post_comment)(url, body_file, \*[, runner])           | Post a file's content as a comment on the issue; returns the comment's URL.             |
-| [`raw_url_base`](#penult.github.raw_url_base)(checkout, folder)                       | The `raw.githubusercontent.com` prefix for files in `folder` at the checkout's commit.  |
-| [`repo_of_checkout`](#penult.github.repo_of_checkout)(path, \*[, runner])                 | The checkout holding `path`: its root, GitHub owner/repo, branch and commit, or `None`. |
-| [`unpushed`](#penult.github.unpushed)(checkout, paths, \*[, runner])              | Which of `paths` are not yet committed and pushed to the branch's upstream.             |
+| [`close_issue`](#penult.github.close_issue)(url, \*[, runner])                     | Close the issue (already closed is fine); returns the issue URL.                              |
+|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| [`edit_comment`](#penult.github.edit_comment)(comment_url, body_file, \*[, runner]) | Replace an existing comment's body (`comment_url` ends in `#issuecomment-<id>`).              |
+| [`edit_issue_body`](#penult.github.edit_issue_body)(url, body_file, \*[, runner])      | Replace the issue's body with a file's content; returns the issue URL.                        |
+| [`fetch_issue`](#penult.github.fetch_issue)(url, \*[, runner])                     | The issue's title, body, labels and comments, as one JSON-ready dict.                         |
+| [`parse_issue_url`](#penult.github.parse_issue_url)(url)                               | `(owner, repo, number)` from an issue URL, or an error that shows the shape.                  |
+| [`post_comment`](#penult.github.post_comment)(url, body_file, \*[, runner])         | Post a file's content as a comment on the issue; returns the comment's URL.                   |
+| [`raw_url_base`](#penult.github.raw_url_base)(checkout, folder)                     | The `raw.githubusercontent.com` prefix for files in `folder` at the checkout's commit.        |
+| [`repo_of_checkout`](#penult.github.repo_of_checkout)(path, \*[, runner])               | The checkout holding `path`: its root, GitHub owner/repo, branch and commit, or `None`.       |
+| [`unpushed`](#penult.github.unpushed)(checkout, paths, \*[, runner])            | Which of `paths` are not yet committed and pushed to the branch's upstream.                   |
+| [`upsert_discussion`](#penult.github.upsert_discussion)(owner, repo, \*, title, body)    | Create the discussion in `category`, or update the one with `discussion_id`; `{"id", "url"}`. |
+
+### penult.github.close_issue(url, \*, runner=<function run>)
+
+Close the issue (already closed is fine); returns the issue URL.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### penult.github.edit_comment(comment_url, body_file, \*, runner=<function run>)
 
 Replace an existing comment’s body (`comment_url` ends in `#issuecomment-<id>`).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### penult.github.edit_issue_body(url, body_file, \*, runner=<function run>)
+
+Replace the issue’s body with a file’s content; returns the issue URL.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -82,3 +99,10 @@ image it references is in this list. Paths are compared in git’s own form
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### penult.github.upsert_discussion(owner, repo, \*, title, body, category='General', discussion_id=None, runner=<function run>)
+
+Create the discussion in `category`, or update the one with `discussion_id`; `{"id", "url"}`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]

@@ -20,6 +20,7 @@ penult layout docs/<slug> --apply                         # size class per image
 penult render docs/<slug> && penult post docs/<slug>      # the essay as an issue comment, images by raw URL
 penult approve docs/<slug> --note "good to go"            # the author's words; this gates publishing
 penult publish docs/<slug>                                # an unpublished Substack draft; you press Publish
+penult finish docs/<slug> [--url <public url>]            # link on the issue, close it, archive the text as a Discussion; repeat with --url once it is public
 ```
 
 ## What penult holds, and what the agent does

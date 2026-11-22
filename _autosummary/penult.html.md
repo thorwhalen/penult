@@ -31,6 +31,7 @@ in the `penult` skill; the verbs here keep every step from being improvised twic
 | [`prefs`](#penult.prefs)(\*[, data_dir, files])                       | The private preferences (defaults overlaid with what the person set).                               |
 | [`prefs_set`](#penult.prefs_set)(key, value, \*[, data_dir, files])       | Set one preference; the value must have the default's type (`2`, `'["me","dfw"]'`, text).           |
 | [`publish`](#penult.publish)([folder, platform, dry_run, ...])          | Hand the approved essay to the publisher for an **unpublished** draft on the platform.              |
+| [`finish`](#penult.finish)([folder, url, category, fetch, runner])     | After `publish`: link the issue, close it, and archive the final text as a Discussion.              |
 | [`render`](#penult.render)([folder, raw_base, data_dir, files, ...])   | Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.              |
 | [`start`](#penult.start)(seed, \*[, into, force, data_dir, ...])      | Fetch the seed (a GitHub issue URL) and make the workspace: seed, brief, state.                     |
 | [`status`](#penult.status)([folder])                                   | Where the workspace stands: stage, files present, images, the posted comment, what comes next.      |
@@ -147,6 +148,22 @@ True
 
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### penult.finish(folder=None, \*, url=None, category='General', fetch=None, runner=<function run>)
+
+After `publish`: link the issue, close it, and archive the final text as a Discussion.
+
+Three steps, each safe to repeat. (1) the link goes on the very top of the issue
+body, as a quote line; (2) the issue is closed with a comment carrying the link;
+(3) the last posted draft, without its review footer, goes to a Discussion in
+the same repository under `--category`, with one provenance line on top
+(issue, platform, source folder). Until the post is public, the link is the
+draft’s editor link, named as private to the author; run `penult finish --url
+<public url>` later and it replaces the link in the body, the comment and the
+discussion. The comment and discussion are updated in place, never duplicated.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### penult.image_add(source, , name, credit, folder=None, license='', prompt=None)
 

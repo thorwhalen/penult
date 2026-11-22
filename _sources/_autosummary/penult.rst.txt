@@ -21,6 +21,7 @@
       prefs
       prefs_set
       publish
+      finish
       render
       start
       status

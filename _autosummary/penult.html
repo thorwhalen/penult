@@ -105,6 +105,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#penult.approve"><code class="docutils literal notranslate"><span class="pre">approve()</span></code></a></li>
 <li><a class="reference internal" href="#penult.check"><code class="docutils literal notranslate"><span class="pre">check()</span></code></a></li>
 <li><a class="reference internal" href="#penult.data_dir"><code class="docutils literal notranslate"><span class="pre">data_dir()</span></code></a></li>
+<li><a class="reference internal" href="#penult.finish"><code class="docutils literal notranslate"><span class="pre">finish()</span></code></a></li>
 <li><a class="reference internal" href="#penult.image_add"><code class="docutils literal notranslate"><span class="pre">image_add()</span></code></a></li>
 <li><a class="reference internal" href="#penult.image_generate"><code class="docutils literal notranslate"><span class="pre">image_generate()</span></code></a></li>
 <li><a class="reference internal" href="#penult.image_search"><code class="docutils literal notranslate"><span class="pre">image_search()</span></code></a></li>
@@ -201,13 +202,16 @@ in the <code class="docutils literal notranslate"><span class="pre">penult</span
 <tr class="row-odd"><td><p><a class="reference internal" href="#penult.publish" title="penult.publish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">publish</span></code></a>([folder, platform, dry_run, ...])</p></td>
 <td><p>Hand the approved essay to the publisher for an <strong>unpublished</strong> draft on the platform.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#penult.render" title="penult.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a>([folder, raw_base, data_dir, files, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.finish" title="penult.finish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finish</span></code></a>([folder, url, category, fetch, runner])</p></td>
+<td><p>After <code class="docutils literal notranslate"><span class="pre">publish</span></code>: link the issue, close it, and archive the final text as a Discussion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.render" title="penult.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a>([folder, raw_base, data_dir, files, ...])</p></td>
 <td><p>Write comment.md: the essay as a GitHub comment, relative images turned into raw URLs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.start" title="penult.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>(seed, *[, into, force, data_dir, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.start" title="penult.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>(seed, *[, into, force, data_dir, ...])</p></td>
 <td><p>Fetch the seed (a GitHub issue URL) and make the workspace: seed, brief, state.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#penult.status" title="penult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>([folder])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.status" title="penult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>([folder])</p></td>
 <td><p>Where the workspace stands: stage, files present, images, the posted comment, what comes next.</p></td>
 </tr>
 </tbody>
@@ -375,6 +379,25 @@ carries no tell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.finish">
+<span class="sig-prename descclassname"><span class="pre">penult.</span></span><span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'General'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/tools.html#finish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.finish" title="Link to this definition">#</a></dt>
+<dd><p>After <code class="docutils literal notranslate"><span class="pre">publish</span></code>: link the issue, close it, and archive the final text as a Discussion.</p>
+<p>Three steps, each safe to repeat. (1) the link goes on the very top of the issue
+body, as a quote line; (2) the issue is closed with a comment carrying the link;
+(3) the last posted draft, without its review footer, goes to a Discussion in
+the same repository under <code class="docutils literal notranslate"><span class="pre">--category</span></code>, with one provenance line on top
+(issue, platform, source folder). Until the post is public, the link is the
+draft’s editor link, named as private to the author; run <code class="docutils literal notranslate"><span class="pre">penult</span> <span class="pre">finish</span> <span class="pre">--url</span>
+<span class="pre">&lt;public</span> <span class="pre">url&gt;</span></code> later and it replaces the link in the body, the comment and the
+discussion. The comment and discussion are updated in place, never duplicated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -618,7 +641,7 @@ an existing workspace; the brief and the stage are kept.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

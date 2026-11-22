@@ -90,13 +90,16 @@ data-aria-dark="Switch to auto color mode">
       <i class="i-lucide close"></i>
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#penult.github.close_issue"><code class="docutils literal notranslate"><span class="pre">close_issue()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.edit_comment"><code class="docutils literal notranslate"><span class="pre">edit_comment()</span></code></a></li>
+<li><a class="reference internal" href="#penult.github.edit_issue_body"><code class="docutils literal notranslate"><span class="pre">edit_issue_body()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.fetch_issue"><code class="docutils literal notranslate"><span class="pre">fetch_issue()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.parse_issue_url"><code class="docutils literal notranslate"><span class="pre">parse_issue_url()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.post_comment"><code class="docutils literal notranslate"><span class="pre">post_comment()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.raw_url_base"><code class="docutils literal notranslate"><span class="pre">raw_url_base()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.repo_of_checkout"><code class="docutils literal notranslate"><span class="pre">repo_of_checkout()</span></code></a></li>
 <li><a class="reference internal" href="#penult.github.unpushed"><code class="docutils literal notranslate"><span class="pre">unpushed()</span></code></a></li>
+<li><a class="reference internal" href="#penult.github.upsert_discussion"><code class="docutils literal notranslate"><span class="pre">upsert_discussion()</span></code></a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -149,8 +152,14 @@ an authenticated <code class="docutils literal notranslate"><span class="pre">gh
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#penult.github.edit_comment" title="penult.github.edit_comment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_comment</span></code></a>(comment_url, body_file, *[, runner])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.github.close_issue" title="penult.github.close_issue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close_issue</span></code></a>(url, *[, runner])</p></td>
+<td><p>Close the issue (already closed is fine); returns the issue URL.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.github.edit_comment" title="penult.github.edit_comment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_comment</span></code></a>(comment_url, body_file, *[, runner])</p></td>
 <td><p>Replace an existing comment's body (<code class="docutils literal notranslate"><span class="pre">comment_url</span></code> ends in <code class="docutils literal notranslate"><span class="pre">#issuecomment-&lt;id&gt;</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#penult.github.edit_issue_body" title="penult.github.edit_issue_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_issue_body</span></code></a>(url, body_file, *[, runner])</p></td>
+<td><p>Replace the issue's body with a file's content; returns the issue URL.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#penult.github.fetch_issue" title="penult.github.fetch_issue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch_issue</span></code></a>(url, *[, runner])</p></td>
 <td><p>The issue's title, body, labels and comments, as one JSON-ready dict.</p></td>
@@ -170,13 +179,38 @@ an authenticated <code class="docutils literal notranslate"><span class="pre">gh
 <tr class="row-odd"><td><p><a class="reference internal" href="#penult.github.unpushed" title="penult.github.unpushed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpushed</span></code></a>(checkout, paths, *[, runner])</p></td>
 <td><p>Which of <code class="docutils literal notranslate"><span class="pre">paths</span></code> are not yet committed and pushed to the branch's upstream.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#penult.github.upsert_discussion" title="penult.github.upsert_discussion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upsert_discussion</span></code></a>(owner, repo, *, title, body)</p></td>
+<td><p>Create the discussion in <code class="docutils literal notranslate"><span class="pre">category</span></code>, or update the one with <code class="docutils literal notranslate"><span class="pre">discussion_id</span></code>; <code class="docutils literal notranslate"><span class="pre">{&quot;id&quot;,</span> <span class="pre">&quot;url&quot;}</span></code>.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <dl class="py function">
+<dt class="sig sig-object py" id="penult.github.close_issue">
+<span class="sig-prename descclassname"><span class="pre">penult.github.</span></span><span class="sig-name descname"><span class="pre">close_issue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/github.html#close_issue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.github.close_issue" title="Link to this definition">#</a></dt>
+<dd><p>Close the issue (already closed is fine); returns the issue URL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="penult.github.edit_comment">
 <span class="sig-prename descclassname"><span class="pre">penult.github.</span></span><span class="sig-name descname"><span class="pre">edit_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/github.html#edit_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.github.edit_comment" title="Link to this definition">#</a></dt>
 <dd><p>Replace an existing comment’s body (<code class="docutils literal notranslate"><span class="pre">comment_url</span></code> ends in <code class="docutils literal notranslate"><span class="pre">#issuecomment-&lt;id&gt;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.github.edit_issue_body">
+<span class="sig-prename descclassname"><span class="pre">penult.github.</span></span><span class="sig-name descname"><span class="pre">edit_issue_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/github.html#edit_issue_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.github.edit_issue_body" title="Link to this definition">#</a></dt>
+<dd><p>Replace the issue’s body with a file’s content; returns the issue URL.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -259,6 +293,17 @@ image it references is in this list. Paths are compared in git’s own form
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="penult.github.upsert_discussion">
+<span class="sig-prename descclassname"><span class="pre">penult.github.</span></span><span class="sig-name descname"><span class="pre">upsert_discussion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'General'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discussion_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">run&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/penult/github.html#upsert_discussion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#penult.github.upsert_discussion" title="Link to this definition">#</a></dt>
+<dd><p>Create the discussion in <code class="docutils literal notranslate"><span class="pre">category</span></code>, or update the one with <code class="docutils literal notranslate"><span class="pre">discussion_id</span></code>; <code class="docutils literal notranslate"><span class="pre">{&quot;id&quot;,</span> <span class="pre">&quot;url&quot;}</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
         </article><button class="back-to-top" type="button">
@@ -301,7 +346,7 @@ image it references is in this list. Paths are compared in git’s own form
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

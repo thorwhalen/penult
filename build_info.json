@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-21T18:18:18Z",
+  "built_at": "2026-11-22T12:54:38Z",
   "package": {
     "name": "penult",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "display_name": "penult",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5",
-    "short_commit": "1605f5d",
+    "commit": "da8724be21c18633ac1c9da198afe36728107884",
+    "short_commit": "da8724b",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/penult",
-    "commit_url": "https://github.com/thorwhalen/penult/commit/1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5",
+    "commit_url": "https://github.com/thorwhalen/penult/commit/da8724be21c18633ac1c9da198afe36728107884",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/penult",
-    "sha": "1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5",
+    "sha": "da8724be21c18633ac1c9da198afe36728107884",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "44934643088",
-    "run_url": "https://github.com/thorwhalen/penult/actions/runs/44934643088",
+    "run_id": "45024586398",
+    "run_url": "https://github.com/thorwhalen/penult/actions/runs/45024586398",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -56,20 +56,20 @@
   },
   "site": {
     "modules_documented": 8,
-    "objects_documented": 76
+    "objects_documented": 80
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.4",
+    "latest": "0.0.5",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/penult && cd penult\ngit checkout 1605f5dff15dc63dfaf9738759f1f6f10a6f6fa5\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/penult && cd penult\ngit checkout da8724be21c18633ac1c9da198afe36728107884\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.3) is behind the latest release on PyPI (0.0.4): `pip install penult` gives newer code than these docs describe."
+      "The documented version (0.0.4) is behind the latest release on PyPI (0.0.5): `pip install penult` gives newer code than these docs describe."
     ]
   }
 }

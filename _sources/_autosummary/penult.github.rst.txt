@@ -8,11 +8,14 @@ penult.github
 
    .. autosummary::
    
+      close_issue
       edit_comment
+      edit_issue_body
       fetch_issue
       parse_issue_url
       post_comment
       raw_url_base
       repo_of_checkout
       unpushed
+      upsert_discussion
    
