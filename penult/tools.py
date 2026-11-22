@@ -881,9 +881,13 @@ def finish(
     ws = _ws(folder)
     state = ws.read_state()
     if state.get("stage") != "published":
-        raise PenultError("nothing is published yet (penult publish), so there is nothing to finish")
+        raise PenultError(
+            "nothing is published yet (penult publish), so there is nothing to finish"
+        )
     if not ws.comment.is_file():
-        raise PenultError(f"no {ws.comment.name}; the final text is the last posted draft")
+        raise PenultError(
+            f"no {ws.comment.name}; the final text is the last posted draft"
+        )
     issue_url = state["issue"]
     platform = state.get("published_to") or state.get("platform") or "substack"
     public = url or state.get("public_url")
@@ -891,13 +895,20 @@ def finish(
     if public:
         link, label = public, f"Published on {platform}"
     elif editor:
-        link, label = editor, f"Unpublished {platform} draft (editor link, private to the author)"
+        link, label = (
+            editor,
+            f"Unpublished {platform} draft (editor link, private to the author)",
+        )
     else:
-        raise PenultError("there is no link to show yet: no draft URL in the state; pass --url <public url>")
+        raise PenultError(
+            "there is no link to show yet: no draft URL in the state; pass --url <public url>"
+        )
     link_line = f"> **{label}:** {link}"
 
     if url:
-        ws.update_state(public_url=url)  # first: a rerun without --url must not downgrade the link
+        ws.update_state(
+            public_url=url
+        )  # first: a rerun without --url must not downgrade the link
     issue = (fetch or functools.partial(_gh.fetch_issue, runner=runner))(issue_url)
     owner, repo, number = _gh.parse_issue_url(issue_url)
     checkout = _gh.repo_of_checkout(ws.folder, runner=runner)
@@ -916,6 +927,7 @@ def finish(
     closing = f"Done: {label.lower()}." + (f"\n\n{link}" if public else "")
     title = essay_fields(_essay_text(ws)).get("title") or issue["title"]
     with tempfile.TemporaryDirectory() as tmp:
+
         def as_file(name: str, text: str) -> Path:
             path = Path(tmp) / name
             path.write_text(text, encoding="utf-8")
@@ -927,7 +939,9 @@ def finish(
         # issue is touched.
         closing_file = as_file("closing.md", closing)
         if state.get("close_comment_url"):
-            closing_url = _gh.edit_comment(state["close_comment_url"], closing_file, runner=runner)
+            closing_url = _gh.edit_comment(
+                state["close_comment_url"], closing_file, runner=runner
+            )
         else:
             closing_url = _gh.post_comment(issue_url, closing_file, runner=runner)
         ws.update_state(close_comment_url=closing_url)
@@ -939,7 +953,9 @@ def finish(
         )  # fmt: skip
         ws.update_state(discussion=discussion)
         _gh.edit_issue_body(
-            issue_url, as_file("body.md", _with_link_line(issue["body"], link_line)), runner=runner
+            issue_url,
+            as_file("body.md", _with_link_line(issue["body"], link_line)),
+            runner=runner,
         )
         _gh.close_issue(issue_url, runner=runner)
     ws.update_state(finished=now())

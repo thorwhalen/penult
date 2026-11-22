@@ -177,7 +177,9 @@ mutation($id: ID!, $title: String!, $body: String!) {
 def _graphql(runner: Runner, query: str, *, what: str, **variables: str) -> dict:
     # the JSON goes on stdin: an essay is too long for an argument and would show in ps
     payload = json.dumps({"query": query, "variables": variables})
-    out = _run(runner, ["gh", "api", "graphql", "--input", "-"], what=what, input=payload)
+    out = _run(
+        runner, ["gh", "api", "graphql", "--input", "-"], what=what, input=payload
+    )
     return json.loads(out or "{}").get("data") or {}
 
 
